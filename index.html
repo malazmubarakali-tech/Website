@@ -9,7 +9,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -762,14 +761,21 @@
             `).join('');
         }
 
-        /* showToast مُعرَّفة في web-adapter.js — لا داعي لإعادة التعريف هنا */
+        function showToast(msg) {
+            const t = document.getElementById('toastWeb');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+        window.showToast = showToast;
+        window.showStoryToast = showToast;
     </script>
     <script src="data.js"></script>
     <script src="data2.js"></script>
     <script src="data3.js"></script>
     <script src="data4.js"></script>
-    <script src="web-adapter.js"></script>
-    <script src="script.js"></script>
+    <script src="web-adapter.js?v=2"></script>
+    <script src="script.js?v=2"></script>
     <script src="app-patches.js"></script>
     <script>
         // After all scripts loaded, update hero stats
