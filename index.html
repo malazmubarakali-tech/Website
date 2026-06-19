@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تعلم الكورية | Korean Learning</title>
+    <meta name="description" content="تعلم اللغة الكورية بأسلوب ممتع وتفاعلي - قصص، استماع، قراءة، كتابة">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- ===== NAVBAR ===== -->
+    <header class="navbar" id="navbar">
+        <div class="navbar-inner">
+            <div class="nav-brand">
+                <span class="brand-emoji">🐰</span>
+                <div class="brand-text">
+                    <span class="brand-title">تعلم الكورية</span>
+                    <span class="brand-sub">Korean Learning</span>
+                </div>
+            </div>
+
+            <nav class="nav-links" id="navLinks">
+                <a class="nav-item active" data-target="home" onclick="showScreen('home')">
+                    <i class="fa-solid fa-house"></i>
+                    <span>الرئيسية</span>
+                </a>
+                <a class="nav-item" data-target="learn" onclick="showScreen('learn')">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                    <span>مركز التعلم</span>
+                </a>
+                <a class="nav-item" data-target="achievements" onclick="showScreen('achievements')">
+                    <i class="fa-solid fa-fire"></i>
+                    <span>الإنجازات</span>
+                </a>
+                <a class="nav-item" data-target="profile" onclick="showScreen('profile')">
+                    <i class="fa-regular fa-user"></i>
+                    <span>حسابي</span>
+                </a>
+            </nav>
+
+            <button class="hamburger" id="hamburger" onclick="toggleMenu()">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- ===== MOBILE NAV OVERLAY ===== -->
+    <div class="mobile-overlay" id="mobileOverlay" onclick="toggleMenu()"></div>
+    <div class="mobile-nav" id="mobileNav">
+        <a class="mnav-item" onclick="showScreen('home');toggleMenu()"><i class="fa-solid fa-house"></i> الرئيسية</a>
+        <a class="mnav-item" onclick="showScreen('learn');toggleMenu()"><i class="fa-solid fa-graduation-cap"></i> مركز التعلم</a>
+        <a class="mnav-item" onclick="showScreen('achievements');toggleMenu()"><i class="fa-solid fa-fire"></i> الإنجازات</a>
+        <a class="mnav-item" onclick="showScreen('profile');toggleMenu()"><i class="fa-regular fa-user"></i> حسابي</a>
+    </div>
+
+    <!-- ===== MAIN WRAPPER ===== -->
+    <main class="main-wrapper">
+
+        <!-- ========== شاشة الرئيسية ========== -->
+        <section class="page-screen active-screen" id="home-screen">
+
+            <!-- Hero Banner -->
+            <div class="hero-banner">
+                <div class="hero-content">
+                    <div class="hero-badge"><i class="fa-solid fa-earth-asia"></i> Korean Learning</div>
+                    <h1 class="hero-title" id="heroGreeting">أهلاً بعودتك! 🌸</h1>
+                    <p class="hero-quote" id="dailyQuote">الألف ميل يبدأ بخطوة</p>
+                    <div class="hero-stats-row">
+                        <div class="hero-mini-stat"><i class="fa-solid fa-fire"></i> <span id="heroStreak">0</span> يوم</div>
+                        <div class="hero-mini-stat"><i class="fa-solid fa-star"></i> <span id="heroXP">0</span> XP</div>
+                        <div class="hero-mini-stat"><i class="fa-solid fa-book"></i> <span id="heroStories">0</span> قصة</div>
+                    </div>
+                </div>
+                <div class="hero-mascot">
+                    <div class="mascot-bubble">안녕하세요! 🌸</div>
+                    <span class="big-rabbit">🐰</span>
+                    <div class="mascot-heart"><i class="fa-solid fa-heart"></i></div>
+                </div>
+            </div>
+
+            <!-- Lessons Grid -->
+            <div class="section-head">
+                <i class="fa-solid fa-book-open-reader"></i>
+                <h2>الدروس المتاحة</h2>
+            </div>
+
+            <div class="lessons-grid">
+                <div class="lesson-card card-chat" onclick="goToChatWithDelay()">
+                    <div class="lesson-card-top">
+                        <div class="lesson-icon-wrap"><i class="fa-regular fa-comments"></i></div>
+                        <span class="lesson-tag">محادثة</span>
+                    </div>
+                    <h3>الدردشة الكورية</h3>
+                    <p>تعبيرات الشباب في الدردشة اليومية</p>
+                    <button class="lesson-btn">ابدأ الآن <i class="fa-solid fa-arrow-left"></i></button>
+                </div>
+
+                <div class="lesson-card card-read" onclick="openReading()">
+                    <div class="lesson-card-top">
+                        <div class="lesson-icon-wrap"><i class="fa-solid fa-book-bookmark"></i></div>
+                        <span class="lesson-tag">قراءة</span>
+                    </div>
+                    <h3>القراءة</h3>
+                    <p>قصص تفاعلية بالكورية مترجمة للعربية</p>
+                    <button class="lesson-btn">ابدأ الآن <i class="fa-solid fa-arrow-left"></i></button>
+                </div>
+
+                <div class="lesson-card card-listen" onclick="openListening()">
+                    <div class="lesson-card-top">
+                        <div class="lesson-icon-wrap"><i class="fa-solid fa-headphones-simple"></i></div>
+                        <span class="lesson-tag">استماع</span>
+                    </div>
+                    <h3>الاستماع</h3>
+                    <p>تدرب يومي على النطق والفهم الكوري</p>
+                    <button class="lesson-btn">ابدأ الآن <i class="fa-solid fa-arrow-left"></i></button>
+                </div>
+
+                <div class="lesson-card card-write" onclick="openWriting()">
+                    <div class="lesson-card-top">
+                        <div class="lesson-icon-wrap"><i class="fa-solid fa-feather-pointed"></i></div>
+                        <span class="lesson-tag">كتابة</span>
+                    </div>
+                    <h3>الكتابة</h3>
+                    <p>تمارين الكتابة الكورية - TOPIK II</p>
+                    <button class="lesson-btn">ابدأ الآن <i class="fa-solid fa-arrow-left"></i></button>
+                </div>
+            </div>
+
+            <!-- Quick Story Access -->
+            <div class="section-head">
+                <i class="fa-solid fa-book-open"></i>
+                <h2>القصص الكورية</h2>
+                <button class="see-all-btn" onclick="switchToStoriesScreen()">عرض الكل <i class="fa-solid fa-arrow-left"></i></button>
+            </div>
+
+            <div class="stories-preview-grid" id="storiesPreviewGrid">
+                <!-- Filled by JS -->
+            </div>
+
+        </section>
+
+        <!-- ========== شاشة مركز التعلم ========== -->
+        <section class="page-screen" id="learn-screen">
+            <div class="page-header">
+                <h2><i class="fa-solid fa-graduation-cap"></i> مركز التعلم</h2>
+                <p>معلومات يومية تساعدك في رحلة تعلم الكورية</p>
+            </div>
+
+            <div class="learn-desktop-grid">
+                <div class="learn-card-web tip-card">
+                    <div class="learn-card-icon">💡</div>
+                    <div class="learn-card-body">
+                        <h3>نصيحة اليوم</h3>
+                        <p id="tipText">حاول أن تتعلم 5 كلمات جديدة يوميًا واستخدمها في جمل.</p>
+                        <button class="refresh-btn" onclick="refreshTip()"><i class="fa-solid fa-rotate"></i> نصيحة أخرى</button>
+                    </div>
+                </div>
+
+                <div class="learn-card-web topik-card">
+                    <div class="learn-card-icon">📝</div>
+                    <div class="learn-card-body">
+                        <h3>🎯 هل تعلم عن TOPIK؟</h3>
+                        <p id="topikText">امتحان TOPIK I يتكون من 30 سؤال استماع و 30 سؤال قراءة.</p>
+                        <button class="refresh-btn" onclick="refreshTopik()"><i class="fa-solid fa-rotate"></i> معلومة أخرى</button>
+                    </div>
+                </div>
+
+                <div class="learn-card-web motive-card">
+                    <div class="learn-card-icon">💪</div>
+                    <div class="learn-card-body">
+                        <h3>🌟 جرعة تحفيز</h3>
+                        <p id="motivationText">كل حرف تتعلمه يقرّبك من حلمك. لا تتوقف!</p>
+                        <button class="refresh-btn" onclick="refreshMotivation()"><i class="fa-solid fa-rotate"></i> تحفيز آخر</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Korean Alphabet Quick Reference -->
+            <div class="section-head" style="margin-top: 40px;">
+                <i class="fa-solid fa-language"></i>
+                <h2>الحروف الكورية الأساسية (الهانغول)</h2>
+            </div>
+            <div class="hangul-grid">
+                <div class="hangul-card"><span class="hangul-char">ㄱ</span><span class="hangul-roman">g/k</span></div>
+                <div class="hangul-card"><span class="hangul-char">ㄴ</span><span class="hangul-roman">n</span></div>
+                <div class="hangul-card"><span class="hangul-char">ㄷ</span><span class="hangul-roman">d/t</span></div>
+                <div class="hangul-card"><span class="hangul-char">ㄹ</span><span class="hangul-roman">r/l</span></div>
+                <div class="hangul-card"><span class="hangul-char">ㅁ</span><span class="hangul-roman">m</span></div>
+                <div class="hangul-card"><span class="hangul-char">ㅂ</span><span class="hangul-roman">b/p</span></div>
+                <div class="hangul-card"><span class="hangul-char">ㅅ</span><span class="hangul-roman">s</span></div>
+                <div class="hangul-card"><span class="hangul-char">ㅇ</span><span class="hangul-roman">ng</span></div>
+                <div class="hangul-card"><span class="hangul-char">ㅈ</span><span class="hangul-roman">j</span></div>
+                <div class="hangul-card"><span class="hangul-char">ㅊ</span><span class="hangul-roman">ch</span></div>
+                <div class="hangul-card"><span class="hangul-char">ㅋ</span><span class="hangul-roman">k</span></div>
+                <div class="hangul-card"><span class="hangul-char">ㅌ</span><span class="hangul-roman">t</span></div>
+                <div class="hangul-card"><span class="hangul-char">ㅍ</span><span class="hangul-roman">p</span></div>
+                <div class="hangul-card"><span class="hangul-char">ㅎ</span><span class="hangul-roman">h</span></div>
+                <div class="hangul-card vowel"><span class="hangul-char">ㅏ</span><span class="hangul-roman">a</span></div>
+                <div class="hangul-card vowel"><span class="hangul-char">ㅓ</span><span class="hangul-roman">eo</span></div>
+                <div class="hangul-card vowel"><span class="hangul-char">ㅗ</span><span class="hangul-roman">o</span></div>
+                <div class="hangul-card vowel"><span class="hangul-char">ㅜ</span><span class="hangul-roman">u</span></div>
+                <div class="hangul-card vowel"><span class="hangul-char">ㅡ</span><span class="hangul-roman">eu</span></div>
+                <div class="hangul-card vowel"><span class="hangul-char">ㅣ</span><span class="hangul-roman">i</span></div>
+                <div class="hangul-card vowel"><span class="hangul-char">ㅐ</span><span class="hangul-roman">ae</span></div>
+                <div class="hangul-card vowel"><span class="hangul-char">ㅔ</span><span class="hangul-roman">e</span></div>
+            </div>
+        </section>
+
+        <!-- ========== شاشة الإنجازات ========== -->
+        <section class="page-screen" id="achievements-screen">
+            <div class="page-header">
+                <h2><i class="fa-solid fa-fire"></i> الإنجازات</h2>
+                <p>تتبع تقدمك ونجاحاتك في تعلم الكورية</p>
+            </div>
+
+            <div class="achievements-layout">
+                <!-- Left: Progress & Stats -->
+                <div class="ach-left">
+                    <div class="progress-card-web">
+                        <div class="progress-card-head">
+                            <span>📚 القصص المكتملة</span>
+                            <span id="progressText">0 / 40</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-fill-web" id="progressFill"></div>
+                            <div class="progress-rabbit" id="progressCharacter">🐰</div>
+                        </div>
+                        <div class="stars-row" id="starsRow"></div>
+                    </div>
+
+                    <div class="stats-web-grid">
+                        <div class="stat-web-card pink">
+                            <span class="stat-web-emoji">📖</span>
+                            <span class="stat-web-value" id="statStories">0</span>
+                            <span class="stat-web-label">قصص مكتملة</span>
+                        </div>
+                        <div class="stat-web-card yellow">
+                            <span class="stat-web-emoji">⚡</span>
+                            <span class="stat-web-value" id="statXP">0</span>
+                            <span class="stat-web-label">نقاط الخبرة</span>
+                        </div>
+                        <div class="stat-web-card teal">
+                            <span class="stat-web-emoji">🎧</span>
+                            <span class="stat-web-value" id="statListening">0</span>
+                            <span class="stat-web-label">تمارين الاستماع</span>
+                        </div>
+                        <div class="stat-web-card purple">
+                            <span class="stat-web-emoji">✍️</span>
+                            <span class="stat-web-value" id="statWriting">0</span>
+                            <span class="stat-web-label">تمارين الكتابة</span>
+                        </div>
+                    </div>
+
+                    <div class="encouragement-web" id="encouragementMsg">🐰 كل قصة تقرّبك من القمة!</div>
+                </div>
+
+                <!-- Right: Badges -->
+                <div class="ach-right">
+                    <h3 class="badges-title-web">🎖️ الشارات المكتسبة</h3>
+                    <div class="badges-web-grid" id="badgesGrid"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== شاشة الحساب ========== -->
+        <section class="page-screen" id="profile-screen">
+            <div class="page-header">
+                <h2><i class="fa-regular fa-user"></i> حسابي</h2>
+                <p>إدارة ملفك الشخصي وإعدادات حسابك</p>
+            </div>
+
+            <div class="profile-layout">
+                <!-- Profile Card -->
+                <div class="profile-main-card">
+                    <div class="profile-avatar-web" id="userAvatar">😊</div>
+                    <div class="profile-info-web">
+                        <h2 id="userName">متعلم</h2>
+                        <p>تقدمك محفوظ على هذا الجهاز</p>
+                    </div>
+                    <button class="edit-btn-web" onclick="openEditProfile()">
+                        <i class="fa-solid fa-pen-to-square"></i> تعديل الملف
+                    </button>
+                </div>
+
+                <div class="profile-grid">
+                    <!-- Streak -->
+                    <div class="streak-card-web">
+                        <div class="streak-fire">🔥</div>
+                        <div class="streak-data">
+                            <span class="streak-num" id="streakDays">0</span>
+                            <span class="streak-lbl">يوم متتالي</span>
+                        </div>
+                        <p class="streak-msg" id="streakMessage">استمر، أنت تتحسن!</p>
+                    </div>
+
+                    <!-- Detailed Stats -->
+                    <div class="detail-stats-web">
+                        <div class="detail-stat">
+                            <i class="fa-solid fa-clock"></i>
+                            <span class="dv" id="totalHours">0</span>
+                            <span class="dl">ساعة تعلم</span>
+                        </div>
+                        <div class="detail-stat">
+                            <i class="fa-solid fa-circle-check"></i>
+                            <span class="dv" id="completionRate">0%</span>
+                            <span class="dl">معدل الإتمام</span>
+                        </div>
+                        <div class="detail-stat">
+                            <i class="fa-solid fa-book"></i>
+                            <span class="dv" id="totalItems">0</span>
+                            <span class="dl">عنصر مكتمل</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Edit Profile Section -->
+                <div id="editProfileSection" style="display:none;" class="edit-section-web">
+                    <h3>🎨 خصّص ملفك الشخصي</h3>
+                    <div class="edit-form-web">
+                        <input type="text" id="customName" class="web-input" placeholder="أدخل اسمك">
+                        <div class="avatar-picker" id="avatarPicker">
+                            <span class="avatar-option" data-avatar="😊">😊</span>
+                            <span class="avatar-option" data-avatar="🐰">🐰</span>
+                            <span class="avatar-option" data-avatar="🦊">🦊</span>
+                            <span class="avatar-option" data-avatar="🐱">🐱</span>
+                            <span class="avatar-option" data-avatar="🐶">🐶</span>
+                            <span class="avatar-option" data-avatar="👽">👽</span>
+                        </div>
+                        <div class="edit-btns">
+                            <button class="save-btn-web" onclick="saveCustomProfile()"><i class="fa-solid fa-floppy-disk"></i> حفظ التغييرات</button>
+                            <button class="cancel-btn-web" onclick="closeEditProfile()">إلغاء</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="profile-actions">
+                    <a href="privacy-policy.html" target="_blank" class="action-link-web">
+                        <i class="fa-solid fa-shield-halved"></i> سياسة الخصوصية
+                    </a>
+                    <button class="reset-btn-web" onclick="handleLogout()">
+                        <i class="fa-solid fa-arrows-rotate"></i> إعادة تعيين التقدم
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== شاشة قائمة القصص ========== -->
+        <section class="page-screen" id="stories-screen">
+            <div class="stories-page-header">
+                <div>
+                    <h2><i class="fa-solid fa-book-open"></i> مكتبة القصص الكورية</h2>
+                    <p>قصص أصيلة مترجمة مع نطق صوتي</p>
+                </div>
+                <button class="back-home-web" onclick="switchToMainScreen()">
+                    <i class="fa-solid fa-house"></i> الرئيسية
+                </button>
+            </div>
+
+            <div class="stories-tabs-web">
+                <button class="stab active" onclick="showTab(0)">🐥 قصص أطفال</button>
+                <button class="stab" onclick="showTab(1)">👀 قصص ممتعة</button>
+                <button class="stab" onclick="showTab(2)">💞 قصص عاطفية</button>
+                <button class="stab" onclick="showTab(3)">💀 قصص رعب</button>
+            </div>
+
+            <div id="content" class="stories-web-grid"></div>
+        </section>
+
+        <!-- ========== شاشات القصص التفصيلية ========== -->
+        <!-- Stories 0-9 (children & fun) -->
+        <section class="story-view-screen" id="story-screen-0">
+            <div class="story-web-layout">
+                <div class="story-sidebar">
+                    <button class="story-back-web" onclick="switchToStoriesList()"><i class="fa-solid fa-arrow-right"></i> رجوع</button>
+                    <div class="story-meta-web">
+                        <h1>💨 방귀쟁이 며느리</h1>
+                        <p class="story-cat-tag">قصص أطفال</p>
+                    </div>
+                    <button class="audio-btn-web" id="audioBtn0" onclick="toggleAudio(0)">
+                        <span id="btnContent0"><i class="fa-solid fa-play"></i> تشغيل الصوت</span>
+                    </button>
+                    <div class="tts-status" id="ttsStatus0"></div>
+                    <div class="lesson web-lesson">
+                        <strong>📌 الدرس المستفاد</strong><br>
+                        الصدق والطبيعة هما أساس الراحة. ما تعتبره عيباً قد يكون مصدر قوتك الحقيقية.
+                    </div>
+                    <button class="done-btn-web" onclick="completeStoryAndGoBack()">أنهيت القصة بنجاح! 🎉</button>
+                </div>
+                <div class="story-content-web">
+                    <div class="story-container" id="storyText0"></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="story-view-screen" id="story-screen-1">
+            <div class="story-web-layout">
+                <div class="story-sidebar">
+                    <button class="story-back-web" onclick="switchToStoriesList()"><i class="fa-solid fa-arrow-right"></i> رجوع</button>
+                    <div class="story-meta-web">
+                        <h1>🐰🐢 토끼와 거북이</h1>
+                        <p class="story-cat-tag">قصص أطفال</p>
+                    </div>
+                    <button class="audio-btn-web" id="audioBtn1" onclick="toggleAudio(1)">
+                        <span id="btnContent1"><i class="fa-solid fa-play"></i> تشغيل الصوت</span>
+                    </button>
+                    <div class="tts-status" id="ttsStatus1"></div>
+                    <div class="lesson web-lesson">
+                        <strong>📌 الدرس المستفاد</strong><br>
+                        النجاح لا يحتاج سرعة، يحتاج استمرار. اللي يكمل للنهاية يفوز.
+                    </div>
+                    <button class="done-btn-web" onclick="completeStoryAndGoBack()">أنهيت القصة بنجاح! 🎉</button>
+                </div>
+                <div class="story-content-web">
+                    <div class="story-container" id="storyText1"></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="story-view-screen" id="story-screen-2">
+            <div class="story-web-layout">
+                <div class="story-sidebar">
+                    <button class="story-back-web" onclick="switchToStoriesList()"><i class="fa-solid fa-arrow-right"></i> رجوع</button>
+                    <div class="story-meta-web">
+                        <h1>🐦 흥부와 놀부</h1>
+                        <p class="story-cat-tag">قصص أطفال</p>
+                    </div>
+                    <button class="audio-btn-web" id="audioBtn2" onclick="toggleAudio(2)">
+                        <span id="btnContent2"><i class="fa-solid fa-play"></i> تشغيل الصوت</span>
+                    </button>
+                    <div class="tts-status" id="ttsStatus2"></div>
+                    <div class="lesson web-lesson">
+                        <strong>📌 الدرس المستفاد</strong><br>
+                        الطيب والخير يرجعان لصاحبهما. ازرع الخير بنية صادقة ولا تحسد.
+                    </div>
+                    <button class="done-btn-web" onclick="completeStoryAndGoBack()">أنهيت القصة بنجاح! 🎉</button>
+                </div>
+                <div class="story-content-web">
+                    <div class="story-container" id="storyText2"></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="story-view-screen" id="story-screen-3">
+            <div class="story-web-layout">
+                <div class="story-sidebar">
+                    <button class="story-back-web" onclick="switchToStoriesList()"><i class="fa-solid fa-arrow-right"></i> رجوع</button>
+                    <div class="story-meta-web"><h1>🐰🐯 토끼와 호랑이</h1><p class="story-cat-tag">قصص أطفال</p></div>
+                    <button class="audio-btn-web" id="audioBtn3" onclick="toggleAudio(3)"><span id="btnContent3"><i class="fa-solid fa-play"></i> تشغيل الصوت</span></button>
+                    <div class="tts-status" id="ttsStatus3"></div>
+                    <div class="lesson web-lesson"><strong>📌 الدرس المستفاد</strong><br>القوة البدنية وحدها لا تكفي. الذكاء والهدوء يهزمان أي خطر.</div>
+                    <button class="done-btn-web" onclick="completeStoryAndGoBack()">أنهيت القصة بنجاح! 🎉</button>
+                </div>
+                <div class="story-content-web"><div class="story-container" id="storyText3"></div></div>
+            </div>
+        </section>
+
+        <section class="story-view-screen" id="story-screen-4">
+            <div class="story-web-layout">
+                <div class="story-sidebar">
+                    <button class="story-back-web" onclick="switchToStoriesList()"><i class="fa-solid fa-arrow-right"></i> رجوع</button>
+                    <div class="story-meta-web"><h1>💧 젊어지는 샘물</h1><p class="story-cat-tag">قصص أطفال</p></div>
+                    <button class="audio-btn-web" id="audioBtn4" onclick="toggleAudio(4)"><span id="btnContent4"><i class="fa-solid fa-play"></i> تشغيل الصوت</span></button>
+                    <div class="tts-status" id="ttsStatus4"></div>
+                    <div class="lesson web-lesson"><strong>📌 الدرس المستفاد</strong><br>الطمع والجشع دائماً يؤديان لنتائج عكسية. القناعة كنز لا يفنى.</div>
+                    <button class="done-btn-web" onclick="completeStoryAndGoBack()">أنهيت القصة بنجاح! 🎉</button>
+                </div>
+                <div class="story-content-web"><div class="story-container" id="storyText4"></div></div>
+            </div>
+        </section>
+
+        <section class="story-view-screen" id="story-screen-5">
+            <div class="story-web-layout">
+                <div class="story-sidebar">
+                    <button class="story-back-web" onclick="switchToStoriesList()"><i class="fa-solid fa-arrow-right"></i> رجوع</button>
+                    <div class="story-meta-web"><h1>🍉 당나귀 알</h1><p class="story-cat-tag">قصص أطفال</p></div>
+                    <button class="audio-btn-web" id="audioBtn5" onclick="toggleAudio(5)"><span id="btnContent5"><i class="fa-solid fa-play"></i> تشغيل الصوت</span></button>
+                    <div class="tts-status" id="ttsStatus5"></div>
+                    <div class="lesson web-lesson"><strong>📌 الدرس المستفاد</strong><br>العلم والمعرفة ضروريان. اسأل أهل الخبرة قبل أن تنخدع.</div>
+                    <button class="done-btn-web" onclick="completeStoryAndGoBack()">أنهيت القصة بنجاح! 🎉</button>
+                </div>
+                <div class="story-content-web"><div class="story-container" id="storyText5"></div></div>
+            </div>
+        </section>
+
+        <section class="story-view-screen" id="story-screen-6">
+            <div class="story-web-layout">
+                <div class="story-sidebar">
+                    <button class="story-back-web" onclick="switchToStoriesList()"><i class="fa-solid fa-arrow-right"></i> رجوع</button>
+                    <div class="story-meta-web"><h1>🧂 요술 맷돌</h1><p class="story-cat-tag">قصص أطفال</p></div>
+                    <button class="audio-btn-web" id="audioBtn6" onclick="toggleAudio(6)"><span id="btnContent6"><i class="fa-solid fa-play"></i> تشغيل الصوت</span></button>
+                    <div class="tts-status" id="ttsStatus6"></div>
+                    <div class="lesson web-lesson"><strong>📌 الدرس المستفاد</strong><br>الطمع والسرقة لا يجلبان إلا الهلاك. القناعة راحة.</div>
+                    <button class="done-btn-web" onclick="completeStoryAndGoBack()">أنهيت القصة بنجاح! 🎉</button>
+                </div>
+                <div class="story-content-web"><div class="story-container" id="storyText6"></div></div>
+            </div>
+        </section>
+
+        <section class="story-view-screen" id="story-screen-7">
+            <div class="story-web-layout">
+                <div class="story-sidebar">
+                    <button class="story-back-web" onclick="switchToStoriesList()"><i class="fa-solid fa-arrow-right"></i> رجوع</button>
+                    <div class="story-meta-web"><h1>⚖️ 토끼의 재판</h1><p class="story-cat-tag">قصص ممتعة</p></div>
+                    <button class="audio-btn-web" id="audioBtn7" onclick="toggleAudio(7)"><span id="btnContent7"><i class="fa-solid fa-play"></i> تشغيل الصوت</span></button>
+                    <div class="tts-status" id="ttsStatus7"></div>
+                    <div class="lesson web-lesson"><strong>📌 الدرس المستفاد</strong><br>الذكاء ينتصر على القوة الغاشمة. العقل هو أقوى سلاح.</div>
+                    <button class="done-btn-web" onclick="completeStoryAndGoBack()">أنهيت القصة بنجاح! 🎉</button>
+                </div>
+                <div class="story-content-web"><div class="story-container" id="storyText7"></div></div>
+            </div>
+        </section>
+
+        <section class="story-view-screen" id="story-screen-8">
+            <div class="story-web-layout">
+                <div class="story-sidebar">
+                    <button class="story-back-web" onclick="switchToStoriesList()"><i class="fa-solid fa-arrow-right"></i> رجوع</button>
+                    <div class="story-meta-web"><h1>🐓 수탉과 왕관</h1><p class="story-cat-tag">قصص ممتعة</p></div>
+                    <button class="audio-btn-web" id="audioBtn8" onclick="toggleAudio(8)"><span id="btnContent8"><i class="fa-solid fa-play"></i> تشغيل الصوت</span></button>
+                    <div class="tts-status" id="ttsStatus8"></div>
+                    <div class="lesson web-lesson"><strong>📌 الدرس المستفاد</strong><br>لا تنخدع بكلام المتملقين. الغرور يؤدي إلى الخسارة.</div>
+                    <button class="done-btn-web" onclick="completeStoryAndGoBack()">أنهيت القصة بنجاح! 🎉</button>
+                </div>
+                <div class="story-content-web"><div class="story-container" id="storyText8"></div></div>
+            </div>
+        </section>
+
+        <section class="story-view-screen" id="story-screen-9">
+            <div class="story-web-layout">
+                <div class="story-sidebar">
+                    <button class="story-back-web" onclick="switchToStoriesList()"><i class="fa-solid fa-arrow-right"></i> رجوع</button>
+                    <div class="story-meta-web"><h1>🐭 생쥐들과 방울</h1><p class="story-cat-tag">قصص ممتعة</p></div>
+                    <button class="audio-btn-web" id="audioBtn9" onclick="toggleAudio(9)"><span id="btnContent9"><i class="fa-solid fa-play"></i> تشغيل الصوت</span></button>
+                    <div class="tts-status" id="ttsStatus9"></div>
+                    <div class="lesson web-lesson"><strong>📌 الدرس المستفاد</strong><br>أفضل الخطط لا قيمة لها بدون الشجاعة لتنفيذها.</div>
+                    <button class="done-btn-web" onclick="completeStoryAndGoBack()">أنهيت القصة بنجاح! 🎉</button>
+                </div>
+                <div class="story-content-web"><div class="story-container" id="storyText9"></div></div>
+            </div>
+        </section>
+
+        <!-- Horror Stories 10-19 -->
+        <section class="story-view-screen horror-story" id="story-screen-10">
+            <div class="story-web-layout">
+                <div class="story-sidebar dark-sidebar">
+                    <button class="story-back-web" onclick="switchToStoriesList()"><i class="fa-solid fa-arrow-right"></i> رجوع</button>
+                    <div class="story-meta-web"><h1>👁️ 사각지대</h1><p class="story-cat-tag horror-tag">قصص رعب</p></div>
+                    <button class="audio-btn-web" id="audioBtn10" onclick="toggleAudio(10)"><span id="btnContent10"><i class="fa-solid fa-play"></i> تشغيل الصوت</span></button>
+                    <div class="tts-status" id="ttsStatus10"></div>
+                    <div class="lesson web-lesson dark-lesson"><strong>📌 الدرس المستفاد</strong><br>الرعب الحقيقي لا يأتي من الخارج، بل من أعماق النفس البشرية.</div>
+                    <button class="done-btn-web" onclick="completeStoryAndGoBack()">أنهيت القصة بنجاح! 🎉</button>
+                </div>
+                <div class="story-content-web"><div class="story-container" id="storyText10"></div></div>
+            </div>
+        </section>
+
+        <section class="story-view-screen horror-story" id="story-screen-11">
+            <div class="story-web-layout">
+                <div class="story-sidebar dark-sidebar">
+                    <button class="story-back-web" onclick="switchToStoriesList()"><i class="fa-solid fa-arrow-right"></i> رجوع</button>
+                    <div class="story-meta-web"><h1>🛏️ 7번 병상</h1><p class="story-cat-tag horror-tag">قصص رعب</p></div>
+                    <button class="audio-btn-web" id="audioBtn11" onclick="toggleAudio(11)"><span id="btnContent11"><i class="fa-solid fa-play"></i> تشغيل الصوت</span></button>
+                    <div class="tts-status" id="ttsStatus11"></div>
+                    <div class="lesson web-lesson dark-lesson"><strong>📌 الدرس المستفاد</strong><br>العقل البشري قد يكون أعظم سجّان لنفسه.</div>
+                    <button class="done-btn-web" onclick="completeStoryAndGoBack()">أنهيت القصة بنجاح! 🎉</button>
+                </div>
+                <div class="story-content-web"><div class="story-container" id="storyText11"></div></div>
+            </div>
+        </section>
+
+        <section class="story-view-screen horror-story" id="story-screen-12">
+            <div class="story-web-layout">
+                <div class="story-sidebar dark-sidebar">
+                    <button class="story-back-web" onclick="switchToStoriesList()"><i class="fa-solid fa-arrow-right"></i> رجوع</button>
+                    <div class="story-meta-web"><h1>📞 집 안에서 걸려 온 전화</h1><p class="story-cat-tag horror-tag">قصص رعب</p></div>
+                    <button class="audio-btn-web" id="audioBtn12" onclick="toggleAudio(12)"><span id="btnContent12"><i class="fa-solid fa-play"></i> تشغيل الصوت</span></button>
+                    <div class="tts-status" id="ttsStatus12"></div>
+                    <div class="lesson web-lesson dark-lesson"><strong>📌 الدرس المستفاد</strong><br>الخطر قد يكون مختبئاً في ظلال منازلنا.</div>
+                    <button class="done-btn-web" onclick="completeStoryAndGoBack()">أنهيت القصة بنجاح! 🎉</button>
+                </div>
+                <div class="story-content-web"><div class="story-container" id="storyText12"></div></div>
+            </div>
+        </section>
+
+        <section class="story-view-screen horror-story" id="story-screen-13">
+            <div class="story-web-layout">
+                <div class="story-sidebar dark-sidebar">
+                    <button class="story-back-web" onclick="switchToStoriesList()"><i class="fa-solid fa-arrow-right"></i> رجوع</button>
+                    <div class="story-meta-web"><h1>👂 이식된 목소리</h1><p class="story-cat-tag horror-tag">قصص رعب</p></div>
+                    <button class="audio-btn-web" id="audioBtn13" onclick="toggleAudio(13)"><span id="btnContent13"><i class="fa-solid fa-play"></i> تشغيل الصوت</span></button>
+                    <div class="tts-status" id="ttsStatus13"></div>
+                    <div class="lesson web-lesson dark-lesson"><strong>📌 الدرس المستفاد</strong><br>التكنولوجيا قد تسمح لنا بسماع ما لم يُخلق لنا أن نسمعه.</div>
+                    <button class="done-btn-web" onclick="completeStoryAndGoBack()">أنهيت القصة بنجاح! 🎉</button>
+                </div>
+                <div class="story-content-web"><div class="story-container" id="storyText13"></div></div>
+            </div>
+        </section>
+
+        <section class="story-view-screen horror-story" id="story-screen-14">
+            <div class="story-web-layout">
+                <div class="story-sidebar dark-sidebar">
+                    <button class="story-back-web" onclick="switchToStoriesList()"><i class="fa-solid fa-arrow-right"></i> رجوع</button>
+                    <div class="story-meta-web"><h1>📄 하얀 페이지</h1><p class="story-cat-tag horror-tag">قصص رعب</p></div>
+                    <button class="audio-btn-web" id="audioBtn14" onclick="toggleAudio(14)"><span id="btnContent14"><i class="fa-solid fa-play"></i> تشغيل الصوت</span></button>
+                    <div class="tts-status" id="ttsStatus14"></div>
+                    <div class="lesson web-lesson dark-lesson"><strong>📌 الدرس المستفاد</strong><br>هل نحن بشر حقيقيون أم مجرد سطور في محاكاة؟</div>
+                    <button class="done-btn-web" onclick="completeStoryAndGoBack()">أنهيت القصة بنجاح! 🎉</button>
+                </div>
+                <div class="story-content-web"><div class="story-container" id="storyText14"></div></div>
+            </div>
+        </section>
+
+        <section class="story-view-screen horror-story" id="story-screen-15">
+            <div class="story-web-layout">
+                <div class="story-sidebar dark-sidebar">
+                    <button class="story-back-web" onclick="switchToStoriesList()"><i class="fa-solid fa-arrow-right"></i> رجوع</button>
+                    <div class="story-meta-web"><h1>🛗 잃어버린 층</h1><p class="story-cat-tag horror-tag">قصص رعب</p></div>
+                    <button class="audio-btn-web" id="audioBtn15" onclick="toggleAudio(15)"><span id="btnContent15"><i class="fa-solid fa-play"></i> تشغيل الصوت</span></button>
+                    <div class="tts-status" id="ttsStatus15"></div>
+                    <div class="lesson web-lesson dark-lesson"><strong>📌 الدرس المستفاد</strong><br>هناك عوالم تعيش بين طيات واقعنا، لا تنزل في المحطة الخطأ.</div>
+                    <button class="done-btn-web" onclick="completeStoryAndGoBack()">أنهيت القصة بنجاح! 🎉</button>
+                </div>
+                <div class="story-content-web"><div class="story-container" id="storyText15"></div></div>
+            </div>
+        </section>
+
+        <section class="story-view-screen horror-story" id="story-screen-16">
+            <div class="story-web-layout">
+                <div class="story-sidebar dark-sidebar">
+                    <button class="story-back-web" onclick="switchToStoriesList()"><i class="fa-solid fa-arrow-right"></i> رجوع</button>
+                    <div class="story-meta-web"><h1>🧱 벽 속의 손님</h1><p class="story-cat-tag horror-tag">قصص رعب</p></div>
+                    <button class="audio-btn-web" id="audioBtn16" onclick="toggleAudio(16)"><span id="btnContent16"><i class="fa-solid fa-play"></i> تشغيل الصوت</span></button>
+                    <div class="tts-status" id="ttsStatus16"></div>
+                    <div class="lesson web-lesson dark-lesson"><strong>📌 الدرس المستفاد</strong><br>العقل المنعزل قد يخلق حقيقة بديلة كاملة ليهرب من الوحدة.</div>
+                    <button class="done-btn-web" onclick="completeStoryAndGoBack()">أنهيت القصة بنجاح! 🎉</button>
+                </div>
+                <div class="story-content-web"><div class="story-container" id="storyText16"></div></div>
+            </div>
+        </section>
+
+        <section class="story-view-screen horror-story" id="story-screen-17">
+            <div class="story-web-layout">
+                <div class="story-sidebar dark-sidebar">
+                    <button class="story-back-web" onclick="switchToStoriesList()"><i class="fa-solid fa-arrow-right"></i> رجوع</button>
+                    <div class="story-meta-web"><h1>📻 한밤의 라디오 방송</h1><p class="story-cat-tag horror-tag">قصص رعب</p></div>
+                    <button class="audio-btn-web" id="audioBtn17" onclick="toggleAudio(17)"><span id="btnContent17"><i class="fa-solid fa-play"></i> تشغيل الصوت</span></button>
+                    <div class="tts-status" id="ttsStatus17"></div>
+                    <div class="lesson web-lesson dark-lesson"><strong>📌 الدرس المستفاد</strong><br>كم من الأصوات التي نسمعها يومياً هي حقيقية حقاً؟</div>
+                    <button class="done-btn-web" onclick="completeStoryAndGoBack()">أنهيت القصة بنجاح! 🎉</button>
+                </div>
+                <div class="story-content-web"><div class="story-container" id="storyText17"></div></div>
+            </div>
+        </section>
+
+        <section class="story-view-screen horror-story" id="story-screen-18">
+            <div class="story-web-layout">
+                <div class="story-sidebar dark-sidebar">
+                    <button class="story-back-web" onclick="switchToStoriesList()"><i class="fa-solid fa-arrow-right"></i> رجوع</button>
+                    <div class="story-meta-web"><h1>⚖️ 과도한 무게</h1><p class="story-cat-tag horror-tag">قصص رعب</p></div>
+                    <button class="audio-btn-web" id="audioBtn18" onclick="toggleAudio(18)"><span id="btnContent18"><i class="fa-solid fa-play"></i> تشغيل الصوت</span></button>
+                    <div class="tts-status" id="ttsStatus18"></div>
+                    <div class="lesson web-lesson dark-lesson"><strong>📌 الدرس المستفاد</strong><br>أكثر الكوابيس رعباً تأتي من المساحات التي نعتقد أنها آمنة.</div>
+                    <button class="done-btn-web" onclick="completeStoryAndGoBack()">أنهيت القصة بنجاح! 🎉</button>
+                </div>
+                <div class="story-content-web"><div class="story-container" id="storyText18"></div></div>
+            </div>
+        </section>
+
+        <section class="story-view-screen horror-story" id="story-screen-19">
+            <div class="story-web-layout">
+                <div class="story-sidebar dark-sidebar">
+                    <button class="story-back-web" onclick="switchToStoriesList()"><i class="fa-solid fa-arrow-right"></i> رجوع</button>
+                    <div class="story-meta-web"><h1>🖼️ 움직이는 그림</h1><p class="story-cat-tag horror-tag">قصص رعب</p></div>
+                    <button class="audio-btn-web" id="audioBtn19" onclick="toggleAudio(19)"><span id="btnContent19"><i class="fa-solid fa-play"></i> تشغيل الصوت</span></button>
+                    <div class="tts-status" id="ttsStatus19"></div>
+                    <div class="lesson web-lesson dark-lesson"><strong>📌 الدرس المستفاد</strong><br>بعض النظرات تبقى محفورة في الذاكرة للأبد.</div>
+                    <button class="done-btn-web" onclick="completeStoryAndGoBack()">أنهيت القصة بنجاح! 🎉</button>
+                </div>
+                <div class="story-content-web"><div class="story-container" id="storyText19"></div></div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Toast Notification -->
+    <div class="toast-web" id="toastWeb"></div>
+
+    <!-- Scripts -->
+    <script>
+        const quotes = [
+            "الألف ميل يبدأ بخطوة ~ لا تستصغر جهدك",
+            "كل كلمة كورية تتعلمها تقربك من حلمك",
+            "작은 노력이 모여 큰 꿈이 된다 ~ الجهود الصغيرة تبني حلماً كبيراً",
+            "لا تقارن نفسك بالآخرين.. رحلتك مختلفة وجميلة",
+            "힘내세요! أنت أقوى مما تتصوّر",
+            "التكرار يصنع المعجزات.. تدرب ولو 5 دقائق يومياً",
+            "실수해도 괜찮아요! الأخطاء دليل أنك تحاول",
+            "كل خبير كان مبتدئاً في يوم من الأيام",
+            "파이팅! النجاح ينتظر من يستمر"
+        ];
+
+        function toggleMenu() {
+            const nav = document.getElementById('mobileNav');
+            const overlay = document.getElementById('mobileOverlay');
+            const btn = document.getElementById('hamburger');
+            nav.classList.toggle('open');
+            overlay.classList.toggle('open');
+            btn.classList.toggle('open');
+        }
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 20) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('dailyQuote').textContent = quotes[Math.floor(Math.random() * quotes.length)];
+            updateHeroStats();
+            loadStoriesPreview();
+        });
+
+        function updateHeroStats() {
+            const data = getAchievements ? getAchievements() : { xp: 0, streakDays: 0, storiesCompleted: 0 };
+            const stored = JSON.parse(localStorage.getItem('korean_app_achievements') || '{}');
+            document.getElementById('heroStreak').textContent = stored.streakDays || 0;
+            document.getElementById('heroXP').textContent = stored.xp || 0;
+            document.getElementById('heroStories').textContent = stored.storiesCompleted || 0;
+            const uname = stored.userName || 'متعلم';
+            document.getElementById('heroGreeting').textContent = 'أهلاً بعودتك، ' + uname + '! 🌸';
+        }
+
+        function loadStoriesPreview() {
+            const previews = [
+                { id: 0, emoji: '💨', title: 'الكنة المطلقة للريح', kr: '방귀쟁이 며느리' },
+                { id: 1, emoji: '🐰🐢', title: 'الأرنب والسلحفاة', kr: '토끼와 거북이' },
+                { id: 7, emoji: '⚖️', title: 'محاكمة الأرنب', kr: '토끼의 재판' },
+                { id: 10, emoji: '👁️', title: 'المنطقة العمياء', kr: '사각지대' },
+                { id: 11, emoji: '🛏️', title: 'السرير رقم 7', kr: '7번 병상' },
+                { id: 2, emoji: '🐦', title: 'هونغبو ونولبو', kr: '흥부와 놀부' },
+            ];
+            const grid = document.getElementById('storiesPreviewGrid');
+            grid.innerHTML = previews.map(s => `
+                <div class="story-preview-card" onclick="openStoryDetails(${s.id})">
+                    <div class="spc-emoji">${s.emoji}</div>
+                    <div class="spc-body">
+                        <span class="spc-kr">${s.kr}</span>
+                        <span class="spc-ar">${s.title}</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-left spc-arrow"></i>
+                </div>
+            `).join('');
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toastWeb');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+        window.showToast = showToast;
+        window.showStoryToast = showToast;
+    </script>
+    <script src="data.js"></script>
+    <script src="data2.js"></script>
+    <script src="data3.js"></script>
+    <script src="data4.js"></script>
+    <script src="web-adapter.js"></script>
+    <script src="script.js"></script>
+    <script src="app-patches.js"></script>
+    <script>
+        // After all scripts loaded, update hero stats
+        window.addEventListener('load', function() {
+            updateHeroStats();
+        });
+    </script>
+</body>
+</html>
