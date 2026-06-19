@@ -145,8 +145,8 @@
                     emojiIcon +
                 '</div>' +
                 '<div class="title">' +
-                    (story.title || '') +
-                    (story.kr ? '<br><span style="font-family:Fredoka,sans-serif;font-size:11px;color:#a78bfa;direction:ltr;">' + story.kr + '</span>' : '') +
+                    (story.titleAR || story.title || '') +
+                    (story.titleKR ? '<br><span style="font-family:Fredoka,sans-serif;font-size:11px;color:#a78bfa;direction:ltr;">' + story.titleKR + '</span>' : (story.kr ? '<br><span style="font-family:Fredoka,sans-serif;font-size:11px;color:#a78bfa;direction:ltr;">' + story.kr + '</span>' : '')) +
                 '</div>';
 
             card.addEventListener('click', (function (id) {

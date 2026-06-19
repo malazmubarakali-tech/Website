@@ -1523,8 +1523,20 @@ body::before {
     .lessons-grid { grid-template-columns: repeat(2, 1fr); }
     .learn-desktop-grid { grid-template-columns: repeat(2, 1fr); }
     .motive-card { grid-column: 1 / -1; }
-    .story-web-layout { grid-template-columns: 1fr; }
-    .story-sidebar { position: static; }
+    .story-web-layout {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+    .story-sidebar {
+        position: static;
+        padding: 20px;
+        border-radius: var(--r-lg);
+        gap: 12px;
+    }
+    .story-sidebar .story-back-web { align-self: flex-start; }
+    .story-content-web { width: 100%; }
+    .story-container { padding: 20px; border-radius: var(--r-lg); min-height: unset; }
     .hamburger { display: flex; }
     .nav-links { display: none; }
 }
