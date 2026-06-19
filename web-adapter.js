@@ -1,418 +1,403 @@
 /* ============================================================
-   web-adapter.js — Bridge between mobile app JS and desktop web
+   web-adapter.js — Fixed version: all 40 stories work
    ============================================================ */
 
-(function() {
+(function () {
     'use strict';
 
-    /* ===== Override showScreen to work with new page-screen class ===== */
-    window.showScreen = function(screenId) {
-        // Hide all page screens and story screens
-        document.querySelectorAll('.page-screen').forEach(s => s.classList.remove('active-screen'));
-        document.querySelectorAll('.story-view-screen').forEach(s => {
+    /* ── تتبع التاب والقصة الحالية ── */
+    window.currentTab = 0;
+    var _currentStoryIdx = -1;
+
+    /* ══════════════════════════════════════════════
+       1.  showScreen — يُظهر أي شاشة رئيسية
+    ══════════════════════════════════════════════ */
+    window.showScreen = function (screenId) {
+        document.querySelectorAll('.page-screen').forEach(function (s) {
+            s.classList.remove('active-screen');
+        });
+        document.querySelectorAll('.story-view-screen').forEach(function (s) {
             s.classList.remove('active-screen');
             s.style.display = 'none';
         });
 
-        const target = document.getElementById(screenId + '-screen');
+        var target = document.getElementById(screenId + '-screen');
         if (target) {
             target.classList.add('active-screen');
             target.style.display = 'block';
         }
 
-        // Update nav active state
-        document.querySelectorAll('.nav-item').forEach(tab => tab.classList.remove('active'));
-        const activeTab = document.querySelector(`[data-target="${screenId}"]`);
+        document.querySelectorAll('.nav-item').forEach(function (t) { t.classList.remove('active'); });
+        var activeTab = document.querySelector('[data-target="' + screenId + '"]');
         if (activeTab) activeTab.classList.add('active');
 
-        // Scroll to top
         window.scrollTo({ top: 0, behavior: 'smooth' });
 
-        // Load screen-specific data
-        if (screenId === 'achievements') {
-            setTimeout(() => {
-                if (typeof loadAchievements === 'function') loadAchievements();
-            }, 50);
-        }
-        if (screenId === 'learn') {
-            setTimeout(() => {
-                if (typeof loadLearnContent === 'function') loadLearnContent();
-            }, 50);
-        }
-        if (screenId === 'profile') {
-            setTimeout(() => {
-                if (typeof loadProfile === 'function') loadProfile();
-            }, 50);
-        }
+        if (screenId === 'achievements') setTimeout(function () { loadAchievements && loadAchievements(); }, 50);
+        if (screenId === 'learn')        setTimeout(function () { loadLearnContent && loadLearnContent(); }, 50);
+        if (screenId === 'profile')      setTimeout(function () { window.loadProfile && window.loadProfile(); }, 50);
+        if (screenId === 'home')         setTimeout(updateHeroStats, 100);
 
-        // Update hero stats when going home
-        if (screenId === 'home') {
-            setTimeout(updateHeroStats, 100);
+        /* لما نفتح شاشة القصص — اعرض التاب الحالي */
+        if (screenId === 'stories') {
+            setTimeout(function () { window.showTab(window.currentTab || 0); }, 80);
         }
     };
 
-    /* ===== Override switchToMainScreen ===== */
-    window.switchToMainScreen = function() {
-        cancelTTS && cancelTTS();
+    /* ══════════════════════════════════════════════
+       2.  التنقل بين الشاشات
+    ══════════════════════════════════════════════ */
+    window.switchToMainScreen = function () {
+        typeof cancelTTS === 'function' && cancelTTS();
         showScreen('home');
     };
 
-    /* ===== Override switchToStoriesScreen ===== */
-    window.switchToStoriesScreen = function() {
+    window.switchToStoriesScreen = function () { showScreen('stories'); };
+    window.goToStoriesWithDelay  = function () { setTimeout(switchToStoriesScreen, 300); };
+
+    window.switchToStoriesList = function () {
+        typeof cancelTTS     === 'function' && cancelTTS();
+        typeof stopAllAudio  === 'function' && stopAllAudio();
+
+        document.querySelectorAll('.story-view-screen').forEach(function (s) {
+            s.classList.remove('active-screen');
+            s.style.display = 'none';
+        });
         showScreen('stories');
-        setTimeout(() => {
-            if (typeof initStories === 'function') initStories();
-            if (typeof showTab === 'function') showTab(currentTab || 0);
-        }, 50);
     };
 
-    window.goToStoriesWithDelay = function() {
-        setTimeout(switchToStoriesScreen, 300);
-    };
+    /* ══════════════════════════════════════════════
+       3.  openStoryDetails — يفتح قصة بالـ index
+    ══════════════════════════════════════════════ */
+    window.openStoryDetails = function (index) {
+        /* أنشئ الـ screen إذا لم يكن موجوداً */
+        ensureStoryScreen(index);
 
-    /* ===== Override switchToStoriesList ===== */
-    window.switchToStoriesList = function() {
-        cancelTTS && cancelTTS();
-        stopAllAudio && stopAllAudio();
-
-        // Hide all story screens
-        document.querySelectorAll('.story-view-screen').forEach(s => {
+        document.querySelectorAll('.page-screen').forEach(function (s) { s.classList.remove('active-screen'); });
+        document.querySelectorAll('.story-view-screen').forEach(function (s) {
             s.classList.remove('active-screen');
             s.style.display = 'none';
         });
 
-        showScreen('stories');
-    };
+        var screen = document.getElementById('story-screen-' + index);
+        if (!screen) { console.warn('Story screen not found:', index); return; }
 
-    /* ===== Override openStoryDetails to work with sidebar layout ===== */
-    window.openStoryDetails = function(index) {
-        // Hide all screens
-        document.querySelectorAll('.page-screen').forEach(s => s.classList.remove('active-screen'));
-        document.querySelectorAll('.story-view-screen').forEach(s => {
-            s.classList.remove('active-screen');
-            s.style.display = 'none';
-        });
+        screen.classList.add('active-screen');
+        screen.style.display = 'block';
+        _currentStoryIdx = index;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
 
-        const screen = document.getElementById('story-screen-' + index);
-        if (screen) {
-            screen.classList.add('active-screen');
-            screen.style.display = 'block';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-
-            // Load story content
-            if (typeof loadStoryContent === 'function') {
-                loadStoryContent(index);
-            }
+        /* احشو النص إذا فارغ */
+        var textEl = document.getElementById('storyText' + index);
+        if (textEl && textEl.innerHTML.trim() === '' && typeof allStories !== 'undefined' && allStories[index]) {
+            buildStoryHTML(index, allStories[index], textEl);
         }
 
-        // Update nav
-        document.querySelectorAll('.nav-item').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(function (t) { t.classList.remove('active'); });
     };
 
-    /* ===== Override showTab to use new .stab class ===== */
-    const _originalShowTab = window.showTab;
-    window.showTab = function(index) {
-        // Update tab UI
-        document.querySelectorAll('.stab').forEach((t, i) => {
+    /* ══════════════════════════════════════════════
+       4.  showTab — يعرض تاب القصص
+    ══════════════════════════════════════════════ */
+    window.showTab = function (index) {
+        window.currentTab = index;
+
+        document.querySelectorAll('.stab').forEach(function (t, i) {
+            t.classList.toggle('active', i === index);
+        });
+        document.querySelectorAll('.tab').forEach(function (t, i) {
             t.classList.toggle('active', i === index);
         });
 
-        // Also update old .tab class for compatibility
-        document.querySelectorAll('.tab').forEach((t, i) => {
-            t.classList.toggle('active', i === index);
-        });
-
-        currentTab = index;
-
-        // Render the grid
         renderStoriesGrid(index);
     };
 
-    /* ===== Render stories into new web grid ===== */
+    /* ══════════════════════════════════════════════
+       5.  renderStoriesGrid — يرسم كروت القصص
+    ══════════════════════════════════════════════ */
     function renderStoriesGrid(tabIndex) {
-        const container = document.getElementById('content');
+        var container = document.getElementById('content');
         if (!container) return;
         container.innerHTML = '';
 
-        if (typeof stories === 'undefined' || !stories[tabIndex]) return;
+        if (typeof stories === 'undefined') {
+            container.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:40px;">جاري التحميل…</p>';
+            return;
+        }
 
-        const tabStories = stories[tabIndex];
+        var tabStories = stories[tabIndex];
         if (!tabStories || !tabStories.length) {
             container.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:40px;">لا توجد قصص في هذا القسم بعد</p>';
             return;
         }
 
-        tabStories.forEach(story => {
-            const card = document.createElement('div');
+        tabStories.forEach(function (story) {
+            var card = document.createElement('div');
             card.className = 'card';
-            const emojiIcon = (typeof emojis !== 'undefined' && emojis[story.id]) || '📖';
-            const completed = isStoryCompleted && isStoryCompleted(story.id);
 
-            card.innerHTML = `
-                <div class="img-box" style="${completed ? 'background:#d4edda;border-color:#28a745;' : ''}">
-                    ${completed ? '<span style="position:absolute;top:6px;right:6px;font-size:16px;">✅</span>' : ''}
-                    ${emojiIcon}
-                </div>
-                <div class="title">${story.title || ''}${story.kr ? '<br><span style="font-family:Fredoka,sans-serif;font-size:12px;color:#a78bfa;direction:ltr;">' + story.kr + '</span>' : ''}</div>
-            `;
+            var emojiIcon = (typeof emojis !== 'undefined' && emojis[story.id]) ? emojis[story.id] : '📖';
+            var completed  = typeof isStoryCompleted === 'function' && isStoryCompleted(story.id);
+
             card.style.position = 'relative';
-            card.addEventListener('click', () => openStoryDetails(story.id));
+            card.innerHTML =
+                '<div class="img-box" style="' + (completed ? 'background:#d4edda;border-color:#28a745;' : '') + '">' +
+                    (completed ? '<span style="position:absolute;top:4px;right:4px;font-size:14px;">✅</span>' : '') +
+                    emojiIcon +
+                '</div>' +
+                '<div class="title">' +
+                    (story.title || '') +
+                    (story.kr ? '<br><span style="font-family:Fredoka,sans-serif;font-size:11px;color:#a78bfa;direction:ltr;">' + story.kr + '</span>' : '') +
+                '</div>';
+
+            card.addEventListener('click', (function (id) {
+                return function () { openStoryDetails(id); };
+            })(story.id));
+
             container.appendChild(card);
         });
     }
 
-    /* ===== Dynamic story screen creation for web layout ===== */
-    window._createDynamicStoryScreen = function(idx, storyData) {
-        const existing = document.getElementById('story-screen-' + idx);
-        if (existing) return; // Already exists
+    /* ══════════════════════════════════════════════
+       6.  ensureStoryScreen — يبني الـ screen ديناميكياً
+    ══════════════════════════════════════════════ */
+    function ensureStoryScreen(idx) {
+        if (document.getElementById('story-screen-' + idx)) return; /* موجود مسبقاً */
 
-        const isHorror = idx >= 30; // Horror stories have higher indices
-        const titleData = (typeof getStoryTitle === 'function') ? getStoryTitle(idx) : { kr: '', ar: '' };
+        /* حدد نوع القصة */
+        var tabName  = getTabName(idx);
+        var isHorror = (tabName === 'قصص رعب');
 
-        const screen = document.createElement('section');
-        screen.id = 'story-screen-' + idx;
+        /* حاول الحصول على العنوان */
+        var kr = '', ar = '';
+        if (typeof getStoryTitle === 'function') {
+            var t = getStoryTitle(idx);
+            kr = t.kr || '';
+            ar = t.ar || '';
+        }
+
+        var screen = document.createElement('section');
+        screen.id        = 'story-screen-' + idx;
         screen.className = 'story-view-screen' + (isHorror ? ' horror-story' : '');
         screen.style.display = 'none';
 
-        screen.innerHTML = `
-            <div class="story-web-layout">
-                <div class="story-sidebar ${isHorror ? 'dark-sidebar' : ''}">
-                    <button class="story-back-web" onclick="switchToStoriesList()">
-                        <i class="fa-solid fa-arrow-right"></i> رجوع
-                    </button>
-                    <div class="story-meta-web">
-                        <h1>${titleData.kr || '📖'}</h1>
-                        <p class="story-cat-tag ${isHorror ? 'horror-tag' : ''}">${getTabName(idx)}</p>
-                    </div>
-                    <button class="audio-btn-web" id="audioBtn${idx}" onclick="toggleAudio(${idx})">
-                        <span id="btnContent${idx}"><i class="fa-solid fa-play"></i> تشغيل الصوت</span>
-                    </button>
-                    <div class="tts-status" id="ttsStatus${idx}"></div>
-                    <div class="lesson web-lesson ${isHorror ? 'dark-lesson' : ''}">
-                        <strong>📌 الدرس المستفاد</strong><br>
-                        ${titleData.ar || ''}
-                    </div>
-                    <button class="done-btn-web" onclick="completeStoryAndGoBack()">أنهيت القصة بنجاح! 🎉</button>
-                </div>
-                <div class="story-content-web">
-                    <div class="story-container" id="storyText${idx}"></div>
-                </div>
-            </div>
-        `;
+        screen.innerHTML =
+            '<div class="story-web-layout">' +
+                '<div class="story-sidebar ' + (isHorror ? 'dark-sidebar' : '') + '">' +
+                    '<button class="story-back-web" onclick="switchToStoriesList()">' +
+                        '<i class="fa-solid fa-arrow-right"></i> رجوع' +
+                    '</button>' +
+                    '<div class="story-meta-web">' +
+                        '<h1>' + (kr || '📖') + '</h1>' +
+                        '<p class="story-cat-tag ' + (isHorror ? 'horror-tag' : '') + '">' + tabName + '</p>' +
+                    '</div>' +
+                    '<button class="audio-btn-web" id="audioBtn' + idx + '" onclick="toggleAudio(' + idx + ')">' +
+                        '<span id="btnContent' + idx + '"><i class="fa-solid fa-play"></i> تشغيل الصوت</span>' +
+                    '</button>' +
+                    '<div class="tts-status" id="ttsStatus' + idx + '"></div>' +
+                    (ar ? '<div class="lesson web-lesson ' + (isHorror ? 'dark-lesson' : '') + '"><strong>📌 الدرس المستفاد</strong><br>' + ar + '</div>' : '') +
+                    '<button class="done-btn-web" onclick="completeStoryAndGoBack()">أنهيت القصة بنجاح! 🎉</button>' +
+                '</div>' +
+                '<div class="story-content-web">' +
+                    '<div class="story-container" id="storyText' + idx + '"></div>' +
+                '</div>' +
+            '</div>';
 
         document.querySelector('.main-wrapper').appendChild(screen);
-    };
-
-    function getTabName(idx) {
-        if (idx < 10) return 'قصص أطفال';
-        if (idx < 20) return 'قصص ممتعة';
-        if (idx < 30) return 'قصص عاطفية';
-        return 'قصص رعب';
     }
 
-    /* ===== Override initStories to NOT recreate screens naively ===== */
-    const _origInitStories = window.initStories;
-    window.initStories = function() {
-        // Just load content without recreating DOM
-        if (typeof allStories !== 'undefined') {
-            allStories.forEach((storyData, idx) => {
-                const textEl = document.getElementById('storyText' + idx);
-                if (textEl && textEl.innerHTML === '') {
-                    buildStoryHTML(idx, storyData, textEl);
+    function getTabName(idx) {
+        /* القصص الأصلية 0-9 في index.html هي أطفال وممتعة */
+        /* بعد دمج script.js: children=0, fun=1, emotional=2, horror=3 */
+        /* نستعمل مصفوفة stories إذا كانت متاحة */
+        if (typeof stories !== 'undefined') {
+            for (var t = 0; t < stories.length; t++) {
+                if (stories[t] && stories[t].some(function (s) { return s.id === idx; })) {
+                    return ['قصص أطفال', 'قصص ممتعة', 'قصص عاطفية', 'قصص رعب'][t] || 'قصص';
                 }
-            });
+            }
         }
-    };
+        return 'قصص';
+    }
 
+    /* ══════════════════════════════════════════════
+       7.  buildStoryHTML — يبني نص القصة
+    ══════════════════════════════════════════════ */
     function buildStoryHTML(idx, storyData, container) {
         if (!storyData || !container) return;
-        let html = '';
-        storyData.forEach((sentence, i) => {
-            if (sentence.kr) {
-                html += `<p class="kr-block"><span id="s${idx}_${i}" class="word">${sentence.kr}</span></p>`;
-            }
-            if (sentence.ar) {
-                html += `<p class="ar-block">${sentence.ar}</p>`;
-            }
+        var html = '';
+        storyData.forEach(function (sentence, i) {
+            if (sentence.kr) html += '<p class="kr-block"><span id="s' + idx + '_' + i + '" class="word">' + sentence.kr + '</span></p>';
+            if (sentence.ar) html += '<p class="ar-block">' + sentence.ar + '</p>';
         });
         container.innerHTML = html;
     }
 
-    /* ===== Override completeStoryAndGoBack ===== */
-    const _origComplete = window.completeStoryAndGoBack;
-    window.completeStoryAndGoBack = function() {
-        // Find current story index
-        let currentIdx = -1;
-        document.querySelectorAll('.story-view-screen.active-screen').forEach(s => {
-            const m = s.id.match(/story-screen-(\d+)/);
-            if (m) currentIdx = parseInt(m[1]);
+    /* ══════════════════════════════════════════════
+       8.  initStories override — يحشو النصوص للـ screens الموجودة
+    ══════════════════════════════════════════════ */
+    window.initStories = function () {
+        if (typeof allStories === 'undefined') return;
+        allStories.forEach(function (storyData, idx) {
+            var textEl = document.getElementById('storyText' + idx);
+            if (textEl && textEl.innerHTML.trim() === '') {
+                buildStoryHTML(idx, storyData, textEl);
+            }
         });
+    };
 
-        if (currentIdx >= 0 && typeof saveStoryCompletion === 'function') {
-            saveStoryCompletion(currentIdx);
+    /* ══════════════════════════════════════════════
+       9.  completeStoryAndGoBack
+    ══════════════════════════════════════════════ */
+    window.completeStoryAndGoBack = function () {
+        var idx = _currentStoryIdx;
+        if (idx >= 0 && typeof saveStoryCompletion === 'function') {
+            saveStoryCompletion(idx);
         }
-
-        stopAllAudio && stopAllAudio();
-        cancelTTS && cancelTTS();
+        typeof stopAllAudio === 'function' && stopAllAudio();
+        typeof cancelTTS    === 'function' && cancelTTS();
 
         showToast('🎉 أحسنت! تم حفظ تقدمك');
-        setTimeout(() => {
+        setTimeout(function () {
             switchToStoriesList();
             updateHeroStats();
         }, 600);
     };
 
-    /* ===== Profile loading ===== */
-    window.loadProfile = function() {
-        const stored = JSON.parse(localStorage.getItem('korean_app_achievements') || '{}');
+    /* ══════════════════════════════════════════════
+       10. Profile
+    ══════════════════════════════════════════════ */
+    window.loadProfile = function () {
+        var stored = JSON.parse(localStorage.getItem('korean_app_achievements') || '{}');
 
-        const nameEl = document.getElementById('userName');
-        if (nameEl) nameEl.textContent = stored.userName || 'متعلم';
+        var set = function (id, val) { var el = document.getElementById(id); if (el) el.textContent = val; };
 
-        const avatarEl = document.getElementById('userAvatar');
-        if (avatarEl) avatarEl.textContent = stored.userAvatar || '😊';
+        set('userName',    stored.userName   || 'متعلم');
+        set('userAvatar',  stored.userAvatar || '😊');
+        set('streakDays',  stored.streakDays || 0);
 
-        const streakEl = document.getElementById('streakDays');
-        if (streakEl) streakEl.textContent = stored.streakDays || 0;
+        var days = stored.streakDays || 0;
+        set('streakMessage',
+            days === 0  ? 'ابدأ رحلتك اليوم!'       :
+            days < 7    ? 'استمر، أنت تتحسن!'        :
+            days < 30   ? 'رائع! أسبوع من التعلم!'   :
+                          '🏆 أنت أسطورة!');
 
-        const msgEl = document.getElementById('streakMessage');
-        if (msgEl) {
-            const days = stored.streakDays || 0;
-            msgEl.textContent = days === 0 ? 'ابدأ رحلتك اليوم!' :
-                days < 7 ? 'استمر، أنت تتحسن!' :
-                days < 30 ? 'رائع! أسبوع من التعلم!' :
-                '🏆 أنت أسطورة!';
-        }
-
-        const hoursEl = document.getElementById('totalHours');
-        if (hoursEl) hoursEl.textContent = Math.floor((stored.xp || 0) / 10);
-
-        const rateEl = document.getElementById('completionRate');
-        if (rateEl) {
-            const total = 40;
-            const done = stored.storiesCompleted || 0;
-            rateEl.textContent = Math.round((done / total) * 100) + '%';
-        }
-
-        const itemsEl = document.getElementById('totalItems');
-        if (itemsEl) {
-            const total = (stored.storiesCompleted || 0) + (stored.listeningCompleted || 0) + (stored.writingCompleted || 0);
-            itemsEl.textContent = total;
-        }
+        set('totalHours',     Math.floor((stored.xp || 0) / 10));
+        set('completionRate', Math.round(((stored.storiesCompleted || 0) / 40) * 100) + '%');
+        set('totalItems',     (stored.storiesCompleted || 0) + (stored.listeningCompleted || 0) + (stored.writingCompleted || 0));
     };
 
-    /* ===== Override openEditProfile / closeEditProfile / saveCustomProfile ===== */
-    window.openEditProfile = function() {
-        const sec = document.getElementById('editProfileSection');
-        if (sec) {
-            sec.style.display = 'block';
-            sec.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }
-        const stored = JSON.parse(localStorage.getItem('korean_app_achievements') || '{}');
-        const nameInput = document.getElementById('customName');
-        if (nameInput) nameInput.value = stored.userName || '';
-
-        // Highlight current avatar
-        document.querySelectorAll('.avatar-option').forEach(opt => {
-            opt.classList.toggle('selected', opt.dataset.avatar === (stored.userAvatar || '😊'));
+    window.openEditProfile = function () {
+        var sec = document.getElementById('editProfileSection');
+        if (sec) { sec.style.display = 'block'; sec.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+        var stored = JSON.parse(localStorage.getItem('korean_app_achievements') || '{}');
+        var inp = document.getElementById('customName');
+        if (inp) inp.value = stored.userName || '';
+        document.querySelectorAll('.avatar-option').forEach(function (o) {
+            o.classList.toggle('selected', o.dataset.avatar === (stored.userAvatar || '😊'));
         });
     };
 
-    window.closeEditProfile = function() {
-        const sec = document.getElementById('editProfileSection');
+    window.closeEditProfile = function () {
+        var sec = document.getElementById('editProfileSection');
         if (sec) sec.style.display = 'none';
     };
 
-    window.saveCustomProfile = function() {
-        const stored = JSON.parse(localStorage.getItem('korean_app_achievements') || '{}');
-        const nameInput = document.getElementById('customName');
-        const selectedAvatar = document.querySelector('.avatar-option.selected');
-
-        if (nameInput && nameInput.value.trim()) {
-            stored.userName = nameInput.value.trim();
-        }
-        if (selectedAvatar) {
-            stored.userAvatar = selectedAvatar.dataset.avatar;
-        }
-
+    window.saveCustomProfile = function () {
+        var stored = JSON.parse(localStorage.getItem('korean_app_achievements') || '{}');
+        var inp = document.getElementById('customName');
+        var sel = document.querySelector('.avatar-option.selected');
+        if (inp && inp.value.trim()) stored.userName = inp.value.trim();
+        if (sel) stored.userAvatar = sel.dataset.avatar;
         localStorage.setItem('korean_app_achievements', JSON.stringify(stored));
         closeEditProfile();
-        loadProfile();
+        window.loadProfile();
         updateHeroStats();
         showToast('✅ تم حفظ التغييرات!');
     };
 
-    // Avatar picker click handler
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
         if (e.target.classList.contains('avatar-option')) {
-            document.querySelectorAll('.avatar-option').forEach(o => o.classList.remove('selected'));
+            document.querySelectorAll('.avatar-option').forEach(function (o) { o.classList.remove('selected'); });
             e.target.classList.add('selected');
         }
     });
 
-    /* ===== Override handleLogout ===== */
-    window.handleLogout = function() {
-        if (!confirm('هل أنت متأكد من إعادة تعيين كل التقدم؟ لا يمكن التراجع.')) return;
-        localStorage.removeItem('korean_app_achievements');
-        localStorage.removeItem('used_tips');
-        localStorage.removeItem('used_topik');
-        localStorage.removeItem('used_motivations');
+    window.handleLogout = function () {
+        if (!confirm('إعادة تعيين كل التقدم؟ لا يمكن التراجع.')) return;
+        ['korean_app_achievements','used_tips','used_topik','used_motivations'].forEach(function (k) {
+            localStorage.removeItem(k);
+        });
         showToast('♻️ تم إعادة تعيين التقدم');
-        loadProfile();
-        loadAchievements();
+        window.loadProfile();
+        loadAchievements && loadAchievements();
         updateHeroStats();
     };
 
-    /* ===== Stories preview shortcut navigation ===== */
-    window.goToChatWithDelay = function() {
-        setTimeout(() => { window.location.href = 'chat.html'; }, 300);
-    };
-    window.openReading = function() {
-        setTimeout(() => { window.location.href = 'reading-menu.html'; }, 300);
-    };
-    window.openListening = function() {
-        setTimeout(() => { window.location.href = 'listening-system.html'; }, 300);
-    };
-    window.openWriting = function() {
-        setTimeout(() => { window.location.href = 'writing-system.html'; }, 300);
+    /* ══════════════════════════════════════════════
+       11. روابط الوحدات الأخرى
+    ══════════════════════════════════════════════ */
+    window.goToChatWithDelay = function () { setTimeout(function () { window.location.href = 'chat.html'; }, 300); };
+    window.openReading       = function () { setTimeout(function () { window.location.href = 'reading-menu.html'; }, 300); };
+    window.openListening     = function () { setTimeout(function () { window.location.href = 'listening-system.html'; }, 300); };
+    window.openWriting       = function () { setTimeout(function () { window.location.href = 'writing-system.html'; }, 300); };
+
+    /* ══════════════════════════════════════════════
+       12. Toast
+    ══════════════════════════════════════════════ */
+    window.showToast = window.showStoryToast = function (msg) {
+        var t = document.getElementById('toastWeb');
+        if (t) {
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(function () { t.classList.remove('show'); }, 3000);
+        }
     };
 
-    /* ===== Initial load ===== */
-    window.addEventListener('load', function() {
-        // Make body visible
+    /* ══════════════════════════════════════════════
+       13. Stubs
+    ══════════════════════════════════════════════ */
+    window.bindNavigationEvents = function () {};
+
+    /* ══════════════════════════════════════════════
+       14. التهيئة عند تحميل الصفحة
+    ══════════════════════════════════════════════ */
+    window.addEventListener('load', function () {
         document.body.style.visibility = 'visible';
 
-        // Ensure only home screen visible initially
-        document.querySelectorAll('.page-screen').forEach(s => {
-            if (s.id === 'home-screen') {
-                s.classList.add('active-screen');
-            } else {
-                s.classList.remove('active-screen');
-            }
+        /* أظهر الرئيسية فقط */
+        document.querySelectorAll('.page-screen').forEach(function (s) {
+            s.classList.toggle('active-screen', s.id === 'home-screen');
         });
-        document.querySelectorAll('.story-view-screen').forEach(s => {
+        document.querySelectorAll('.story-view-screen').forEach(function (s) {
             s.style.display = 'none';
         });
 
-        // Load all initial data
-        setTimeout(() => {
-            loadLearnContent && loadLearnContent();
-            loadAchievements && loadAchievements();
-            loadProfile();
+        /* حشو بيانات كل الـ screens الموجودة في HTML (0-19) */
+        if (typeof allStories !== 'undefined') {
+            allStories.forEach(function (data, idx) {
+                var el = document.getElementById('storyText' + idx);
+                if (el && el.innerHTML.trim() === '') buildStoryHTML(idx, data, el);
+            });
+        }
+
+        /* تحميل البيانات الأولية */
+        setTimeout(function () {
+            loadLearnContent  && loadLearnContent();
+            loadAchievements  && loadAchievements();
+            window.loadProfile();
             updateHeroStats();
             loadStoriesPreview();
         }, 200);
 
-        // Navigate to stories if URL param
+        /* إذا كان URL يحتوي go=stories */
         if (window.location.search.includes('go=stories')) {
             history.replaceState(null, '', window.location.pathname);
             setTimeout(switchToStoriesScreen, 400);
         }
 
-        console.log('✅ Web adapter ready');
+        console.log('✅ web-adapter v2 ready');
     });
 
-    /* ===== Stub functions that aren't needed on web ===== */
-    window.bindNavigationEvents = function() {};
-
 })();
+
