@@ -246,7 +246,33 @@
     };
 
     /* ══════════════════════════════════════════════
-       9.  completeStoryAndGoBack
+       9.  تتبع إكمال القصص (يُستخدم في renderStoriesGrid وcompleteStoryAndGoBack)
+    ══════════════════════════════════════════════ */
+    window.isStoryCompleted = function (idx) {
+        var stored = JSON.parse(localStorage.getItem('korean_app_achievements') || '{}');
+        return Array.isArray(stored.completedStoryIds) && stored.completedStoryIds.indexOf(idx) !== -1;
+    };
+
+    window.saveStoryCompletion = function (idx) {
+        var stored = (typeof getAchievements === 'function')
+            ? getAchievements()
+            : JSON.parse(localStorage.getItem('korean_app_achievements') || '{}');
+        if (!Array.isArray(stored.completedStoryIds)) stored.completedStoryIds = [];
+        if (stored.completedStoryIds.indexOf(idx) === -1) {
+            stored.completedStoryIds.push(idx);
+            stored.storiesCompleted = (stored.storiesCompleted || 0) + 1;
+            stored.xp = (stored.xp || 0) + 20;
+            if (typeof checkBadges === 'function') checkBadges(stored);
+        }
+        if (typeof saveAchievements === 'function') {
+            saveAchievements(stored);
+        } else {
+            localStorage.setItem('korean_app_achievements', JSON.stringify(stored));
+        }
+    };
+
+    /* ══════════════════════════════════════════════
+       10. completeStoryAndGoBack
     ══════════════════════════════════════════════ */
     window.completeStoryAndGoBack = function () {
         var idx = _currentStoryIdx;
@@ -264,7 +290,7 @@
     };
 
     /* ══════════════════════════════════════════════
-       10. Profile
+       11. Profile
     ══════════════════════════════════════════════ */
     window.loadProfile = function () {
         var stored = JSON.parse(localStorage.getItem('korean_app_achievements') || '{}');
@@ -335,7 +361,7 @@
     };
 
     /* ══════════════════════════════════════════════
-       11. روابط الوحدات الأخرى
+       12. روابط الوحدات الأخرى
     ══════════════════════════════════════════════ */
     window.goToChatWithDelay = function () { setTimeout(function () { window.location.href = 'chat.html'; }, 300); };
     window.openReading       = function () { setTimeout(function () { window.location.href = 'reading-menu.html'; }, 300); };
@@ -343,7 +369,7 @@
     window.openWriting       = function () { setTimeout(function () { window.location.href = 'writing-system.html'; }, 300); };
 
     /* ══════════════════════════════════════════════
-       12. Toast
+       13. Toast
     ══════════════════════════════════════════════ */
     window.showToast = window.showStoryToast = function (msg) {
         var t = document.getElementById('toastWeb');
@@ -355,12 +381,12 @@
     };
 
     /* ══════════════════════════════════════════════
-       13. Stubs
+       14. Stubs
     ══════════════════════════════════════════════ */
     window.bindNavigationEvents = function () {};
 
     /* ══════════════════════════════════════════════
-       14. التهيئة عند تحميل الصفحة
+       15. التهيئة عند تحميل الصفحة
     ══════════════════════════════════════════════ */
     window.addEventListener('load', function () {
         document.body.style.visibility = 'visible';
