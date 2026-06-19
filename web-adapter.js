@@ -146,7 +146,7 @@
                 '</div>' +
                 '<div class="title">' +
                     (story.titleAR || story.title || '') +
-                    (story.titleKR ? '<br><span style="font-family:Fredoka,sans-serif;font-size:11px;color:#a78bfa;direction:ltr;">' + story.titleKR + '</span>' : (story.kr ? '<br><span style="font-family:Fredoka,sans-serif;font-size:11px;color:#a78bfa;direction:ltr;">' + story.kr + '</span>' : '')) +
+                    ((story.titleKR || story.kr) ? '<br><span style="font-family:Fredoka,sans-serif;font-size:11px;color:#a78bfa;direction:ltr;">' + (story.titleKR || story.kr) + '</span>' : '') +
                 '</div>';
 
             card.addEventListener('click', (function (id) {
