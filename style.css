@@ -1459,6 +1459,17 @@ body::before {
 .wave-bars span:nth-child(5) { animation-delay: 0.15s; }
 @keyframes soundwave { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(2.2); } }
 
+/* Toast animations used by JS (showToast / showStoryToast) */
+@keyframes xpPop {
+    0%   { opacity: 0; transform: translateX(-50%) scale(0.7); }
+    60%  { transform: translateX(-50%) scale(1.1); }
+    100% { opacity: 1; transform: translateX(-50%) scale(1); }
+}
+@keyframes xpFadeOut {
+    from { opacity: 1; }
+    to   { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+}
+
 /* Horror story darkening */
 .horror-story .story-container { background: rgba(20,10,40,0.7); color: #e0d0ff; border-color: rgba(100,60,150,0.4); }
 .horror-story .ar-block { color: #d0b0f0; }

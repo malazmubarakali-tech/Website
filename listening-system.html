@@ -133,7 +133,7 @@
         @keyframes bounceIn { 0% { transform:translateY(10px); opacity:0; } 60% { transform:translateY(-3px); opacity:1; } 100% { transform:translateY(0); opacity:1; } }
         @media(max-width:520px) { .main-screen,.practice-screen { padding:14px; } .options-grid { grid-template-columns:1fr; } }
     </style>
-  <link rel="manifest" href="/My-Korean-app/manifest.json">
+  <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="/My-Korean-app/icon-192.png">
   <meta name="theme-color" content="#1a1a2e">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -237,7 +237,7 @@
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", function () {
-        navigator.serviceWorker.register("/My-Korean-app/service-worker.js", { scope: "/My-Korean-app/" })
+        navigator.serviceWorker.register("service-worker.js", { scope: "/My-Korean-app/" })
           .then(function () { console.log("✅ SW مسجل"); })
           .catch(function (e) { console.warn("❌ SW خطأ:", e); });
       });

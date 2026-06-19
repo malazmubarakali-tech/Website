@@ -1,0 +1,15 @@
+{
+  "name": "تعلم الكورية",
+  "short_name": "Korean",
+  "description": "تعلم اللغة الكورية بأسلوب ممتع وتفاعلي",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ffd3eb",
+  "theme_color": "#ec4899",
+  "lang": "ar",
+  "dir": "rtl",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

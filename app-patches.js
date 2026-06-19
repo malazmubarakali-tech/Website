@@ -115,6 +115,9 @@
 })();
 
 
+/* ═══════════════════════════════════════════════════════
+   إدارة بيانات التقدم (مركزية ومحمية من الأخطاء)
+═══════════════════════════════════════════════════════ */
 function getAchievements() {
     let data = null;
     try {
@@ -124,13 +127,14 @@ function getAchievements() {
         console.warn('getAchievements error:', e);
     }
     if (!data || typeof data !== 'object') {
-        data = { storiesCompleted: 0, listeningCompleted: 0, writingCompleted: 0, xp: 0, badges: [] };
+        data = {};
     }
-    if (!Array.isArray(data.badges)) data.badges = [];
-    if (typeof data.storiesCompleted !== 'number') data.storiesCompleted = 0;
+    if (!Array.isArray(data.badges))          data.badges = [];
+    if (typeof data.storiesCompleted !== 'number')   data.storiesCompleted = 0;
     if (typeof data.listeningCompleted !== 'number') data.listeningCompleted = 0;
-    if (typeof data.writingCompleted !== 'number') data.writingCompleted = 0;
-    if (typeof data.xp !== 'number') data.xp = 0;
+    if (typeof data.writingCompleted !== 'number')   data.writingCompleted = 0;
+    if (typeof data.xp !== 'number')                 data.xp = 0;
+    if (typeof data.streakDays !== 'number')         data.streakDays = 0;
     return data;
 }
 
@@ -145,3 +149,41 @@ function saveAchievements(data) {
     }
 }
 
+/* ── نظام السلسلة اليومية (Streak) ── */
+(function updateStreak() {
+    try {
+        const data = getAchievements();
+        const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+        const last  = data.lastStudyDate || null;
+
+        if (last === today) return; // نفس اليوم — لا تغيير
+
+        if (last) {
+            const diffDays = Math.round(
+                (new Date(today) - new Date(last)) / 86400000
+            );
+            data.streakDays = diffDays === 1
+                ? (data.streakDays || 0) + 1  // يوم متتالٍ
+                : 1;                            // انقطع التسلسل
+        } else {
+            data.streakDays = 1; // أول زيارة
+        }
+
+        data.lastStudyDate = today;
+        saveAchievements(data);
+    } catch (e) {
+        console.warn('streak update error:', e);
+    }
+})();
+
+/* ── getStoryTitle: يُعيد العنوانين KR/AR لأي قصة ── */
+window.getStoryTitle = function (idx) {
+    if (typeof stories !== 'undefined') {
+        for (let t = 0; t < stories.length; t++) {
+            if (!stories[t]) continue;
+            const found = stories[t].find(s => s.id === idx);
+            if (found) return { kr: found.kr || '', ar: found.ar || '' };
+        }
+    }
+    return { kr: '', ar: '' };
+};

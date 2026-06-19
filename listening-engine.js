@@ -243,6 +243,16 @@ function showCompletion() {
     document.getElementById('completionEmoji').textContent = emoji;
     
     document.getElementById('questionTypeTip').style.display = 'none';
+
+    /* ── حفظ إحصائية الاستماع في التقدم الرئيسي ── */
+    try {
+        var ach = JSON.parse(localStorage.getItem('korean_app_achievements') || '{}');
+        if (typeof ach.listeningCompleted !== 'number') ach.listeningCompleted = 0;
+        ach.listeningCompleted += 1;
+        if (typeof ach.xp !== 'number') ach.xp = 0;
+        ach.xp += 10;
+        localStorage.setItem('korean_app_achievements', JSON.stringify(ach));
+    } catch(e) {}
 }
 
 function showToast(msg) {

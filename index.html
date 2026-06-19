@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -761,14 +762,7 @@
             `).join('');
         }
 
-        function showToast(msg) {
-            const t = document.getElementById('toastWeb');
-            t.textContent = msg;
-            t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 3000);
-        }
-        window.showToast = showToast;
-        window.showStoryToast = showToast;
+        /* showToast مُعرَّفة في web-adapter.js — لا داعي لإعادة التعريف هنا */
     </script>
     <script src="data.js"></script>
     <script src="data2.js"></script>

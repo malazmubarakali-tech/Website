@@ -582,6 +582,15 @@ function evaluateQ53() {
     div.innerHTML = html; 
     div.classList.add('show'); 
     showToast('📊 تم التقييم!');
+    /* ── حفظ إحصائية الكتابة ── */
+    try {
+        var ach = JSON.parse(localStorage.getItem('korean_app_achievements') || '{}');
+        if (typeof ach.writingCompleted !== 'number') ach.writingCompleted = 0;
+        ach.writingCompleted += 1;
+        if (typeof ach.xp !== 'number') ach.xp = 0;
+        ach.xp += 15;
+        localStorage.setItem('korean_app_achievements', JSON.stringify(ach));
+    } catch(e) {}
 }
 
 // ============ المستوى 4: السؤال 54 ============

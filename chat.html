@@ -586,7 +586,7 @@
             opacity: 1;
         }
     </style>
-  <link rel="manifest" href="/My-Korean-app/manifest.json">
+  <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="/My-Korean-app/icon-192.png">
   <meta name="theme-color" content="#1a1a2e">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1169,7 +1169,7 @@ if ('speechSynthesis' in window) {
   <script>
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", function () {
-        navigator.serviceWorker.register("/My-Korean-app/service-worker.js", { scope: "/My-Korean-app/" })
+        navigator.serviceWorker.register("service-worker.js", { scope: "/My-Korean-app/" })
           .then(function () { console.log("✅ SW مسجل"); })
           .catch(function (e) { console.warn("❌ SW خطأ:", e); });
       });
