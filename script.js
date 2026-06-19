@@ -226,92 +226,14 @@ function setPausedUI(idx){
 function cancelTTS(){ stopAudio(); }
 
 // ============ دوال التنقل ============
-function switchToMainScreen() {
-    cancelTTS();
-    document.getElementById('bottomNav').style.display = '';
-    showScreen('home');
-}
-
-function switchToStoriesList() {
-    cancelTTS();
-    for (let i = 0; i < allStories.length; i++) {
-        const screen = document.getElementById("story-screen-" + i);
-        if (screen) screen.style.display = "none";
-    }
-    showScreen('stories');
-    document.getElementById('bottomNav').style.display = 'none';
-    const activeTab = document.querySelector('.tab.active');
-    if (activeTab) {
-        const tabIndex = Array.from(activeTab.parentNode.children).indexOf(activeTab);
-        renderTab(tabIndex);
-    }
-}
-
-function openStoryDetails(index) {
-    cancelTTS();
-    document.getElementById('bottomNav').style.display = 'none';
-    document.querySelectorAll('.app-screen').forEach(s => s.classList.remove('active-screen'));
-
-    for (let i = 0; i < allStories.length; i++) {
-        const screen = document.getElementById("story-screen-" + i);
-        if (screen) screen.style.display = "none";
-    }
-
-    const storyScreen = document.getElementById("story-screen-" + index);
-    if (storyScreen) {
-        storyScreen.style.display = 'block';
-        if (allStories[index]) {
-            setupStoryDOM(allStories[index], 'storyText' + index);
-        }
-    } else {
-        alert('القصة غير متاحة');
-    }
-}
-
-function switchToStoriesScreen() {
-    cancelTTS();
-    document.getElementById('bottomNav').style.display = 'none';
-    showScreen('stories');
-    const activeTab = document.querySelector('.tab.active');
-    const tabIndex = activeTab ? Array.from(activeTab.parentNode.children).indexOf(activeTab) : 0;
-    renderTab(tabIndex);
-}
-
-function goToStoriesWithDelay() { setTimeout(function() { switchToStoriesScreen(); }, 650); }
-function openWriting() { setTimeout(function() { window.location.href = 'writing-system.html'; }, 650); }
-function openListening() { setTimeout(function() { window.location.href = 'listening-system.html'; }, 650); }
-function openReading() { setTimeout(function() { window.location.href = 'reading-menu.html'; }, 650); }
-function goToChatWithDelay() { setTimeout(function() { window.location.href = 'chat.html'; }, 650); }
-
-function showScreen(screenId) {
-    document.querySelectorAll('.app-screen').forEach(s => s.classList.remove('active-screen'));
-    const target = document.getElementById(screenId + '-screen');
-    if (target) target.classList.add('active-screen');
-    document.querySelectorAll('.navigation-tab').forEach(tab => tab.classList.remove('active-tab'));
-    const activeTab = document.querySelector(`[data-target="${screenId}"]`);
-    if (activeTab) activeTab.classList.add('active-tab');
-    if (screenId === 'learn') loadLearnContent();
-    if (screenId === 'achievements') loadAchievements();
-    if (screenId === 'profile') loadProfileContent();
-    if (screenId === 'stories') {
-        document.getElementById('bottomNav').style.display = 'none';
-    } else if (['home','learn','achievements','profile'].includes(screenId)) {
-        document.getElementById('bottomNav').style.display = '';
-    }
-}
-
-function bindNavigationEvents() {
-    document.querySelectorAll('.navigation-tab').forEach(tab => {
-        tab.addEventListener('click', function(e) {
-            e.preventDefault();
-            const target = this.dataset.target;
-            if (target === 'home') switchToMainScreen();
-            else if (target === 'learn') showScreen('learn');
-            else if (target === 'achievements') showScreen('achievements');
-            else if (target === 'profile') showScreen('profile');
-        });
-    });
-}
+// ملاحظة: showScreen / switchToMainScreen / switchToStoriesList / openStoryDetails /
+// switchToStoriesScreen / openReading / openListening / openWriting / goToChatWithDelay
+// معرّفة في web-adapter.js وتعمل بشكل صحيح مع هيكل الصفحة الحالي (page-screen / nav-item).
+// تمت إزالة النسخ القديمة من هنا لأنها كانت مكتوبة لهيكل HTML قديم مختلف
+// (تستخدم كلاسات .app-screen / .navigation-tab وعنصر #bottomNav غير الموجودين في هذه الصفحة)
+// وكانت تُحمَّل بعد web-adapter.js فتستبدل النسخة الصحيحة بنسخة معطوبة، مما كان يمنع
+// تبديل الشاشات (وبالتالي يمنع التمرير التلقائي عند الضغط على "حسابي"/"تعلم"/إلخ)
+// ويكسر فتح وتشغيل القصص.
 
 // ============ المحتوى التعليمي ============
 const tips=["حاول أن تتعلم 5 كلمات جديدة يوميًا واستخدمها في جمل.","شاهد مسلسلات كورية بترجمة كورية لتحسين مهاراتك.","استخدم تطبيق المذكرات لكتابة يومياتك باللغة الكورية.","كرر الكلمات بصوت عالٍ لتثبيت النطق الصحيح.","خصص 10 دقائق يوميًا لمراجعة المفردات القديمة.","حاول التفكير باللغة الكورية بدلاً من الترجمة الحرفية.","اقرأ قصص الأطفال بالكورية، فمفرداتها بسيطة ومفيدة.","استمع إلى الأغاني الكورية وحاول كتابة الكلمات التي تسمعها.","شارك في مجموعات تعلم اللغة الكورية على الإنترنت للممارسة.","لا تخف من الأخطاء، فكل خطأ هو خطوة نحو الإتقان.","ضع أهدافًا أسبوعية صغيرة، مثل حفظ 30 كلمة جديدة.","حاول أن تقرأ مقالاً إخباريًا بالكورية مرة في الأسبوع.","اكتب منشورات قصيرة بالكورية على وسائل التواصل الاجتماعي.","شاهد مقاطع يوتيوب تعليمية عن القواعد الكورية.","استخدم خاصية الترجمة في هاتفك لممارسة النطق.","حاول التحدث مع متحدثين أصليين عبر تطبيقات التبادل اللغوي.","خصص دفترًا للمفردات الصعبة وراجعها بانتظام.","تعلم جملة كورية كاملة بدلاً من كلمة واحدة في كل مرة.","استمع إلى البودكاست الكوري أثناء المشي أو القيادة.","جرب كتابة تعليقات بالكورية على منشورات أصدقائك الكوريين."];
@@ -371,168 +293,15 @@ const emojis = {
     15: '🛗', 16: '🧱', 17: '📻', 18: '⚖️', 19: '🖼️'
 };
 
-// دالة مساعدة للحصول على عنوان القصة من التبويبات
-function getStoryTitle(idx) {
-    for (let tab = 0; tab < stories.length; tab++) {
-        if (stories[tab]) {
-            const found = stories[tab].find(s => s.id === idx);
-            if (found) return { kr: found.titleKR || found.title || '', ar: found.titleAR || found.title || '' };
-        }
-    }
-    return { kr: '', ar: '' };
-}
-
-function initStories() {
-    if (typeof allStories === 'undefined') { console.warn('allStories غير معرف'); return; }
-    for (let i = 0; i < allStories.length; i++) {
-        const container = document.getElementById('storyText' + i);
-        if (container && allStories[i]) {
-            setupStoryDOM(allStories[i], 'storyText' + i);
-        }
-    }
-}
-
-function renderTab(index) {
-    const container = document.getElementById("content");
-    if(!container) return;
-    container.innerHTML = "";
-    if (!stories[index]) return;
-    stories[index].forEach(story => {
-        const card = document.createElement("div");
-        card.className = "card";
-        if(story.id !== -1) {
-            card.onclick = function() { cancelTTS(); openStoryDetails(story.id); };
-        }
-        const tKR = story.titleKR || story.title || '';
-        const tAR = story.titleAR || '';
-        const em = emojis[story.id] || '📖';
-        card.innerHTML = `<div style="flex:1"><div class="title" style="font-family:Fredoka,sans-serif;font-size:13px;direction:ltr;text-align:left;">${tKR}</div><div style="font-size:10px;color:#634785;margin-top:3px;font-weight:700;">${tAR}</div></div><div class="img-box" style="font-size:40px;">${em}</div>`;
-        container.appendChild(card);
-    });
-}
-
-function showTab(index) {
-    document.querySelectorAll(".tab").forEach((t, i) => t.classList.toggle("active", i === index));
-    currentTab = index;
-    renderTab(index);
-}
-
-function setupStoryDOM(storyData, targetContainerId) {
-    const container = document.getElementById(targetContainerId);
-    if(!container) return;
-    container.innerHTML = "";
-    storyData.forEach((item, sentIdx) => {
-        const krDiv = document.createElement('div');
-        krDiv.className = 'kr-block';
-        krDiv.dataset.sentIdx = sentIdx;
-        item.kr.split(' ').forEach((w, wIdx) => {
-            const span = document.createElement('span');
-            span.className = 'word';
-            span.dataset.sentIdx = sentIdx;
-            span.dataset.wordIdx = wIdx;
-            span.innerText = w + ' ';
-            krDiv.appendChild(span);
-        });
-        container.appendChild(krDiv);
-        const arDiv = document.createElement('div');
-        arDiv.className = 'ar-block';
-        arDiv.innerText = item.ar;
-        container.appendChild(arDiv);
-    });
-}
+// ملاحظة: getStoryTitle / initStories / showTab / إنشاء كروت القصص وتفصيلها
+// معرّفة في web-adapter.js (getStoryTitle, window.initStories, window.showTab,
+// renderStoriesGrid, buildStoryHTML, ensureStoryScreen). تمت إزالة النسخ المكررة هنا.
 
 // ============ الملف الشخصي ============
-const PROFILE_KEY = 'user_profile';
-const STREAK_KEY = 'user_streak';
-const LAST_ACTIVE_KEY = 'last_active_date';
-
-function getProfile() {
-    const stored = localStorage.getItem(PROFILE_KEY);
-    return stored ? JSON.parse(stored) : { name: 'متعلم', avatar: '😊' };
-}
-function saveProfile(profile) { localStorage.setItem(PROFILE_KEY, JSON.stringify(profile)); }
-
-function updateStreak() {
-    const today = new Date().toDateString();
-    const lastActive = localStorage.getItem(LAST_ACTIVE_KEY);
-    let streak = parseInt(localStorage.getItem(STREAK_KEY) || '0');
-    if (!lastActive) { streak = 1; }
-    else {
-        const lastDate = new Date(lastActive);
-        const diffTime = new Date(today).getTime() - lastDate.getTime();
-        const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
-        if (diffDays === 0) {}
-        else if (diffDays === 1) { streak += 1; }
-        else { streak = 1; }
-    }
-    localStorage.setItem(STREAK_KEY, streak.toString());
-    localStorage.setItem(LAST_ACTIVE_KEY, today);
-    return streak;
-}
-
-function getTotalLearningHours() {
-    const data = getAchievements();
-    const storyMinutes = data.storiesCompleted * 15;
-    const listeningMinutes = (data.listeningCompleted || 0) * 10;
-    const writingMinutes = (data.writingCompleted || 0) * 15;
-    const totalMinutes = storyMinutes + listeningMinutes + writingMinutes;
-    return (totalMinutes / 60).toFixed(1);
-}
-
-function getCompletionRate() {
-    const data = getAchievements();
-    const totalAvailable = 40 + 30 + 10;
-    const completed = data.storiesCompleted + (data.listeningCompleted || 0) + (data.writingCompleted || 0);
-    return Math.min(100, Math.round((completed / totalAvailable) * 100));
-}
-
-function getTotalCompletedItems() {
-    const data = getAchievements();
-    return data.storiesCompleted + (data.listeningCompleted || 0) + (data.writingCompleted || 0);
-}
-
-function loadProfileContent() {
-    const profile = getProfile();
-    document.getElementById('userName').textContent = profile.name;
-    document.getElementById('userAvatar').textContent = profile.avatar;
-    document.getElementById('customName').value = profile.name;
-    const streak = updateStreak();
-    document.getElementById('streakDays').textContent = streak;
-    const messages = ["استمر، أنت تتحسن!", "عمل رائع! واصل التقدم", "أنت بطل اليوم!", "التزامك ممتاز!"];
-    document.getElementById('streakMessage').textContent = messages[Math.min(streak, messages.length-1)];
-    document.getElementById('totalHours').textContent = getTotalLearningHours();
-    document.getElementById('completionRate').textContent = getCompletionRate() + '%';
-    document.getElementById('totalItems').textContent = getTotalCompletedItems();
-    document.querySelectorAll('.avatar-option').forEach(el => {
-        if (el.dataset.avatar === profile.avatar) el.classList.add('selected');
-        else el.classList.remove('selected');
-    });
-}
-
-function openEditProfile() { document.getElementById('editProfileSection').style.display = 'block'; }
-function closeEditProfile() { document.getElementById('editProfileSection').style.display = 'none'; }
-
-function saveCustomProfile() {
-    const name = document.getElementById('customName').value.trim();
-    if (!name) { showToast('⚠️ الرجاء إدخال اسم'); return; }
-    const selectedAvatar = document.querySelector('.avatar-option.selected');
-    const avatar = selectedAvatar ? selectedAvatar.dataset.avatar : '😊';
-    saveProfile({ name, avatar });
-    showToast('✅ تم حفظ ملفك الشخصي!');
-    closeEditProfile();
-    loadProfileContent();
-}
-
-function handleLogout() {
-    if (confirm('هل أنت متأكد من إعادة تعيين التقدم؟ سيتم مسح جميع بياناتك المحلية!')) {
-        localStorage.removeItem('korean_app_achievements');
-        localStorage.removeItem(PROFILE_KEY);
-        localStorage.removeItem(STREAK_KEY);
-        localStorage.removeItem(LAST_ACTIVE_KEY);
-        showToast('👋 تم مسح التقدم. ابدأ من جديد!');
-        showScreen('profile');
-    }
-}
+// ملاحظة: نظام الملف الشخصي (الاسم/الصورة الرمزية/الستريك) موحّد في web-adapter.js
+// ويستخدم نفس مفتاح التخزين 'korean_app_achievements' المستخدم في باقي الصفحة (الإحصائيات
+// في الصفحة الرئيسية وشاشة الإنجازات). تمت إزالة نظام قديم منفصل كان يخزن البيانات
+// تحت مفاتيح مختلفة (user_profile/user_streak) فيتسبب بعدم تطابق البيانات بين الشاشات.
 
 // ============ أحداث الصفحة ============
 // استخدام تفويض الأحداث لزر "تم" ليشمل الأزرار المضافة ديناميكياً
@@ -541,54 +310,6 @@ document.addEventListener('click', function(e) {
         completeStoryAndGoBack();
     }
 });
-
-document.addEventListener('DOMContentLoaded', function() {
-    // ✅ أول إجراء: إظهار body فوراً (كان مخفياً بـ visibility:hidden في HTML)
-    document.body.style.visibility = 'visible';
-    
-    // إخفاء جميع الشاشات احتياطياً
-    document.querySelectorAll('.app-screen').forEach(s => s.classList.remove('active-screen'));
-    
-    // التحقق من إشارة الانتقال المباشر للقصص (قادم من reading-menu.html)
-    if (sessionStorage.getItem('openStories') === 'true') {
-        // مسح الإشارة فوراً
-        sessionStorage.removeItem('openStories');
-        
-        // تجهيز شاشة القصص مباشرة
-        document.getElementById('stories-screen').classList.add('active-screen');
-        document.getElementById('bottomNav').style.display = 'none';
-        
-        // تأكد من وجود تبويب نشط (افتراضي أول تبويب)
-        const activeTab = document.querySelector('.tab.active');
-        const tabIndex = activeTab ? Array.from(activeTab.parentNode.children).indexOf(activeTab) : 0;
-        currentTab = tabIndex;
-        renderTab(tabIndex);
-        
-        // إيقاف أي تحميل إضافي للشاشات الأخرى والعودة
-        return;
-    }
-    
-    // ✅ إذا لم تكن هناك إشارة، نُفعّل الشاشة الرئيسية بشكل طبيعي
-    document.getElementById('home-screen').classList.add('active-screen');
-    document.getElementById('bottomNav').style.display = '';
-    
-    // ============ باقي إعدادات الصفحة الرئيسية (الأفاتار...) ============
-    document.querySelectorAll('.avatar-option').forEach(opt => {
-        opt.addEventListener('click', function() {
-            document.querySelectorAll('.avatar-option').forEach(o => o.classList.remove('selected'));
-            this.classList.add('selected');
-        });
-    });
-});
-
-function completeStoryAndGoBack() {
-    const data = getAchievements();
-    data.storiesCompleted += 1;
-    data.xp += 20;
-    checkBadges(data);
-    saveAchievements(data);
-    showToast('🎉 أكملت القصة! +20 XP');
-}
 
 function checkBadges(data) {
     if (data.storiesCompleted >= 1 && !data.badges.includes('first-story')) {
@@ -627,175 +348,52 @@ function showStoryToast(msg) {
 }
 
 window.addEventListener('load', function() {
-    bindNavigationEvents();
-    
-    // ============ إعادة بناء allStories والقوائم المرتبطة بها ============
-    const baseAllStories = allStories.slice(); // الأطفال (0-9)
-    const baseStoryTimestamps = Object.assign({}, storyTimestamps);
-    const baseStoryAudioFiles = Object.assign({}, storyAudioFiles);
-    const baseStories = stories.slice();
-    const baseEmojis = Object.assign({}, emojis); // يحتوي على إيموجيات الأطفال والرعب الأصلية
-    
-    // إفراغ المصفوفات والكائنات
-    allStories.length = 0;
-    for (let key in storyTimestamps) delete storyTimestamps[key];
-    for (let key in storyAudioFiles) delete storyAudioFiles[key];
-    for (let key in emojis) delete emojis[key];
-    stories.length = 0;
-    
-    // 1. استعادة القصص الأساسية (الأطفال)
-    allStories.push(...baseAllStories);
-    Object.assign(storyTimestamps, baseStoryTimestamps);
-    Object.assign(storyAudioFiles, baseStoryAudioFiles);
-    // استعادة إيموجيات الأطفال فقط (0-9)
-    for (let i = 0; i < 10; i++) {
-        if (baseEmojis[i]) emojis[i] = baseEmojis[i];
+    // ============ دمج بيانات القصص الإضافية (data2/data3/data4.js) ============
+    // كل ملف بيانات معرّف أصلاً بمعرّفات (id) ثابتة لا تتغير:
+    //   data.js  -> قصص الأطفال:   0-9
+    //   data2.js -> قصص الرعب:     10-19  (مطابقة لشاشات story-screen-10..19 الموجودة في index.html)
+    //   data3.js -> القصص العاطفية: 20-29
+    //   data4.js -> القصص الممتعة:  30-39
+    // لذلك يكفي الدمج المباشر بدون إعادة ترقيم؛ إعادة الترقيم القديمة هنا كانت
+    // تحذف شاشات الرعب الجاهزة (10-19) وتعيد بناءها بقالب مختلف لا يطابق التنسيق (CSS)،
+    // كما كانت تزيح أرقام قصص الرعب فتتعارض مع البطاقات المعروضة في الصفحة الرئيسية.
+
+    if (typeof allStories3 !== 'undefined') { // قصص الرعب 10-19
+        allStories3.forEach((story, i) => { allStories[10 + i] = story; });
+        if (typeof storyTimestamps3 !== 'undefined') Object.assign(storyTimestamps, storyTimestamps3);
+        if (typeof storyAudioFiles3 !== 'undefined') Object.assign(storyAudioFiles, storyAudioFiles3);
+        if (typeof stories3 !== 'undefined') stories[3] = stories3;
     }
-    stories.push(...baseStories);
-    
-    // 2. إضافة القصص الممتعة (data4.js) في التبويب 1
-    if (typeof allStories1_fun !== 'undefined') {
-        const startIdxFun = allStories.length; // 10
-        allStories1_fun.forEach((story, i) => {
-            const newIdx = startIdxFun + i;
-            allStories.push(story);
-            // نستخدم التوقيتات من المفاتيح الأصلية (30-39) في storyTimestamps1_fun
-            if (typeof storyTimestamps1_fun !== 'undefined' && storyTimestamps1_fun[i + 30]) {
-                storyTimestamps[newIdx] = storyTimestamps1_fun[i + 30];
-            }
-            if (typeof storyAudioFiles1_fun !== 'undefined' && storyAudioFiles1_fun[i + 30] !== undefined) {
-                storyAudioFiles[newIdx] = storyAudioFiles1_fun[i + 30];
-            }
-        });
-        if (typeof stories1_fun !== 'undefined') {
-            stories[1] = stories1_fun.map((s, i) => ({
-                ...s,
-                id: startIdxFun + i
-            }));
-        } else {
-            stories[1] = [];
-        }
-        // دمج إيموجيات الممتعة
-        if (typeof funEmojis !== 'undefined') {
-            Object.keys(funEmojis).forEach(key => {
-                const oldIdx = parseInt(key);
-                const newIdx = startIdxFun + (oldIdx - 30);
-                emojis[newIdx] = funEmojis[key];
-            });
-        }
-        console.log('✅ القصص الممتعة أضيفت من فهرس', startIdxFun);
+
+    if (typeof allStories2_emotional !== 'undefined') { // القصص العاطفية 20-29
+        allStories2_emotional.forEach((story, i) => { allStories[20 + i] = story; });
+        if (typeof storyTimestamps2_emotional !== 'undefined') Object.assign(storyTimestamps, storyTimestamps2_emotional);
+        if (typeof storyAudioFiles2_emotional !== 'undefined') Object.assign(storyAudioFiles, storyAudioFiles2_emotional);
+        if (typeof emotionalEmojis !== 'undefined') Object.assign(emojis, emotionalEmojis);
+        if (typeof stories2_emotional !== 'undefined') stories[2] = stories2_emotional;
     }
-    
-    // 3. إضافة القصص العاطفية (data3.js) في التبويب 2
-    if (typeof allStories2_emotional !== 'undefined') {
-        const startIdxEmo = allStories.length; // 20 بعد الممتعة
-        allStories2_emotional.forEach((story, i) => {
-            const newIdx = startIdxEmo + i;
-            allStories.push(story);
-            if (storyTimestamps2_emotional && storyTimestamps2_emotional[i + 20]) {
-                storyTimestamps[newIdx] = storyTimestamps2_emotional[i + 20];
-            }
-            if (storyAudioFiles2_emotional && storyAudioFiles2_emotional[i + 20] !== undefined) {
-                storyAudioFiles[newIdx] = storyAudioFiles2_emotional[i + 20];
-            }
-        });
-        if (typeof stories2_emotional !== 'undefined') {
-            stories[2] = stories2_emotional.map((s, i) => ({
-                ...s,
-                id: startIdxEmo + i
-            }));
-        } else {
-            stories[2] = [];
-        }
-        if (typeof emotionalEmojis !== 'undefined') {
-            Object.keys(emotionalEmojis).forEach(key => {
-                const newIdx = startIdxEmo + (parseInt(key) - 20);
-                emojis[newIdx] = emotionalEmojis[key];
-            });
-        }
-        console.log('✅ القصص العاطفية أضيفت من فهرس', startIdxEmo);
+
+    if (typeof allStories1_fun !== 'undefined') { // القصص الممتعة 30-39
+        allStories1_fun.forEach((story, i) => { allStories[30 + i] = story; });
+        if (typeof storyTimestamps1_fun !== 'undefined') Object.assign(storyTimestamps, storyTimestamps1_fun);
+        if (typeof storyAudioFiles1_fun !== 'undefined') Object.assign(storyAudioFiles, storyAudioFiles1_fun);
+        if (typeof funEmojis !== 'undefined') Object.assign(emojis, funEmojis);
+        if (typeof stories1_fun !== 'undefined') stories[1] = stories1_fun;
     }
-    
-    // 4. إضافة قصص الرعب (data2.js) في التبويب 3
-    if (typeof allStories3 !== 'undefined' && allStories3.length > 0) {
-        const startIdxHorror = allStories.length; // 30 بعد العاطفية
-        allStories3.forEach((story, i) => {
-            const newIdx = startIdxHorror + i;
-            allStories.push(story);
-            if (storyTimestamps3 && storyTimestamps3[i + 10]) {
-                storyTimestamps[newIdx] = storyTimestamps3[i + 10];
-            }
-            if (storyAudioFiles3 && storyAudioFiles3[i + 10] !== undefined) {
-                storyAudioFiles[newIdx] = storyAudioFiles3[i + 10];
-            }
-        });
-        if (typeof stories3 !== 'undefined') {
-            stories[3] = stories3.map((s, i) => ({
-                ...s,
-                id: startIdxHorror + i
-            }));
-        } else {
-            stories[3] = [];
-        }
-        // نقل إيموجيات الرعب الأصلية من الفهارس القديمة (10-19) إلى الفهارس الجديدة
-        for (let i = 0; i < 10; i++) {
-            const oldIdx = 10 + i;
-            const newIdx = startIdxHorror + i;
-            if (baseEmojis[oldIdx]) {
-                emojis[newIdx] = baseEmojis[oldIdx];
-            }
-        }
-        console.log('✅ قصص الرعب أضيفت من فهرس', startIdxHorror);
-    }
-    
-    // ============ حذف الشاشات القديمة للفهارس 10 وما فوق ============
-    for (let idx = 10; idx < allStories.length; idx++) {
-        const oldScreen = document.getElementById('story-screen-' + idx);
-        if (oldScreen) {
-            oldScreen.remove();
-        }
-    }
-    
-    // إنشاء شاشات القصص المفقودة ديناميكياً (لجميع الفهارس من 0 إلى الأخيرة)
-    allStories.forEach((storyData, idx) => {
-        if (!document.getElementById('story-screen-' + idx)) {
-            const titleData = getStoryTitle(idx);
-            const titleHTML = titleData.kr 
-                ? `<h1 style="text-align:center;font-weight:900;margin-bottom: 10px;">${titleData.kr}<br><span style="font-size:18px;color:#634785;">${titleData.ar}</span></h1>`
-                : `<h1 style="text-align:center;font-weight:900;">📖 قصة</h1>`;
-                
-            const screen = document.createElement('div');
-            screen.id = 'story-screen-' + idx;
-            screen.className = 'story-view-screen';
-            screen.style.display = 'none';
-            screen.innerHTML = `
-                <div class="back-btn" onclick="switchToStoriesList()"><i class="fa-solid fa-arrow-right"></i> رجوع</div>
-                ${titleHTML}
-                <div class="listen-btn" id="audioBtn${idx}" onclick="toggleAudio(${idx})">
-                    <span id="btnContent${idx}"><i class="fa-solid fa-play"></i> <span>تشغيل الصوت</span></span>
-                </div>
-                <div class="tts-status" id="ttsStatus${idx}"></div>
-                <div class="story-container" id="storyText${idx}"></div>
-                <div class="action-button-done">لقد أنهيت القصة بنجاح! 🎉</div>
-            `;
-            const screensContainer = document.querySelector('.screens-container');
-            if (screensContainer) {
-                screensContainer.appendChild(screen);
-            } else {
-                document.body.appendChild(screen);
-            }
-        }
-    });
-    
-        initStories();
-    document.querySelectorAll('.story-view-screen').forEach(s => s.style.display = 'none');
+
+    // يملأ نصوص أي شاشة قصة موجودة (0-19) وتترك بناء شاشات 20-39 إلى ensureStoryScreen
+    // في web-adapter.js عند فتحها لأول مرة (بالقالب والتنسيق الصحيحين).
+    initStories();
     loadVoices();
-    
-    // الانتقال التلقائي إلى القصص إذا كان الرابط يحتوي ?go=stories
-    if (window.location.search.includes('go=stories')) {
+
+    // الانتقال التلقائي لشاشة القصص القادم من زر "القصص" في reading-menu.html
+    if (sessionStorage.getItem('openStories') === 'true') {
+        sessionStorage.removeItem('openStories');
+        switchToStoriesScreen();
+    } else if (window.location.search.includes('go=stories')) {
         history.replaceState(null, '', window.location.pathname);
         switchToStoriesScreen();
     }
-    
+
     console.log('✅ التطبيق جاهز');
 });
