@@ -12,6 +12,16 @@
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="/Website/icon-192.png">
     <link rel="stylesheet" href="style.css">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-HXDL0DSDGH"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-HXDL0DSDGH');
+    </script>
 </head>
 <body>
 
@@ -55,7 +65,7 @@
     <div class="mobile-overlay" id="mobileOverlay" onclick="toggleMenu()"></div>
     <div class="mobile-nav" id="mobileNav">
         <a class="mnav-item" onclick="showScreen('home');toggleMenu()"><i class="fa-solid fa-house"></i> الرئيسية</a>
-        <a class="mnav-item" onclick="showScreen('learn');toggleMenu()"><i class="fa-solid fa-graduation-cap"></i> مركز التعلم</a>
+        <a class="mnav-item" onclick="showScreen('learn');toggleMenu()"><i class="fa-solid fa-graduation-cap"></i> center_learning_center</a>
         <a class="mnav-item" onclick="showScreen('achievements');toggleMenu()"><i class="fa-solid fa-fire"></i> الإنجازات</a>
         <a class="mnav-item" onclick="showScreen('profile');toggleMenu()"><i class="fa-regular fa-user"></i> حسابي</a>
     </div>
