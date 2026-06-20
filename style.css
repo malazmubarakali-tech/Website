@@ -1561,3 +1561,350 @@ body::before {
 @media (max-width: 380px) {
     .stories-web-grid { grid-template-columns: 1fr; }
 }
+
+/* ================================================================
+   STORY PAGE  —  النظام الجديد الكامل لصفحات القصص
+   ================================================================ */
+
+/* حاوية الصفحة */
+.story-page {
+    min-height: calc(100vh - var(--nav-h));
+    padding-bottom: 60px;
+    animation: fadeSlideIn 0.35s var(--ease-smooth);
+}
+
+/* وضع الرعب */
+.story-page--dark {
+    background: linear-gradient(135deg, #1a0a2e 0%, #2d1050 60%, #0f0520 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
+}
+.story-page--dark::before { display:none; }
+
+/* ── شريط العودة ── */
+.sp-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.sp-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 22px;
+    background: rgba(255,255,255,0.85);
+    border: 2px solid var(--pink-200);
+    border-radius: var(--r-pill);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--pink-600);
+    cursor: pointer;
+    font-family: 'Tajawal', sans-serif;
+    transition: all 0.2s var(--ease-smooth);
+    backdrop-filter: blur(10px);
+}
+.sp-back-btn:hover {
+    background: var(--pink-500);
+    color: white;
+    border-color: var(--pink-500);
+    transform: translateX(3px);
+}
+.story-page--dark .sp-back-btn {
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(249,168,212,0.35);
+    color: #f9a8d4;
+}
+.story-page--dark .sp-back-btn:hover {
+    background: rgba(249,168,212,0.25);
+    color: white;
+}
+
+.sp-tab-badge {
+    padding: 6px 16px;
+    border-radius: var(--r-pill);
+    font-size: 12px;
+    font-weight: 700;
+    background: var(--pink-100);
+    color: var(--pink-600);
+    border: 1.5px solid var(--pink-200);
+}
+.story-page--dark .sp-tab-badge {
+    background: rgba(100,40,150,0.4);
+    color: #e879f9;
+    border-color: rgba(232,121,249,0.4);
+}
+
+/* ── البطاقة الرئيسية ── */
+.sp-card {
+    background: rgba(255,255,255,0.6);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 2px solid rgba(255,255,255,0.85);
+    border-radius: var(--r-xl);
+    padding: clamp(24px, 4vw, 48px);
+    box-shadow: var(--card-shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 860px;
+    margin: 0 auto;
+}
+.story-page--dark .sp-card {
+    background: rgba(20,8,40,0.75);
+    border-color: rgba(120,60,180,0.4);
+    box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+}
+
+/* ── العنوان ── */
+.sp-title-row { text-align: center; }
+.sp-title {
+    font-family: 'Fredoka', sans-serif;
+    font-size: clamp(22px, 3.5vw, 34px);
+    font-weight: 700;
+    color: var(--text-dark);
+    direction: ltr;
+    text-align: center;
+    line-height: 1.3;
+}
+.story-page--dark .sp-title { color: #f3e8ff; }
+
+/* ── زر الصوت ── */
+.sp-audio-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 16px 24px;
+    background: linear-gradient(135deg, #ff65a3, #ec4899);
+    color: white;
+    border: none;
+    border-radius: var(--r-lg);
+    font-size: 16px;
+    font-weight: 900;
+    font-family: 'Tajawal', sans-serif;
+    cursor: pointer;
+    box-shadow: 0 6px 24px rgba(236,72,153,0.4);
+    transition: all 0.25s var(--ease-smooth);
+}
+.sp-audio-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 32px rgba(236,72,153,0.55);
+}
+.sp-audio-btn:active { transform: scale(0.98); }
+
+/* ── حالة TTS ── */
+.sp-tts-status {
+    text-align: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: #a78bfa;
+    min-height: 18px;
+    margin-top: -8px;
+}
+
+/* ── حاوية النص المتحركة ── */
+.sp-story-scroll {
+    max-height: 420px;
+    overflow-y: auto;
+    border-radius: var(--r-lg);
+    padding: 4px 2px;
+    scroll-behavior: smooth;
+
+    /* شريط التمرير الجميل */
+    scrollbar-width: thin;
+    scrollbar-color: var(--pink-300, #f9a8d4) transparent;
+}
+.sp-story-scroll::-webkit-scrollbar { width: 5px; }
+.sp-story-scroll::-webkit-scrollbar-track { background: transparent; }
+.sp-story-scroll::-webkit-scrollbar-thumb { background: var(--pink-300, #f9a8d4); border-radius: 10px; }
+
+/* ── نص القصة داخل الحاوية ── */
+.sp-story-text {
+    background: rgba(255,255,255,0.55);
+    border-radius: var(--r-lg);
+    padding: 24px 28px;
+    border: 1.5px solid rgba(255,255,255,0.8);
+    line-height: 2.2;
+}
+.story-page--dark .sp-story-text {
+    background: rgba(10,5,25,0.5);
+    border-color: rgba(120,60,180,0.3);
+}
+
+/* جمل الكورية */
+.sp-kr {
+    direction: ltr;
+    text-align: left;
+    font-family: 'Fredoka', sans-serif;
+    font-size: 17px;
+    font-weight: 600;
+    color: #5c3b87;
+    margin-top: 18px;
+    padding: 6px 10px;
+    border-radius: 10px;
+    transition: background 0.25s, padding 0.25s;
+}
+.story-page--dark .sp-kr { color: #c4b5fd; }
+
+/* جمل العربية */
+.sp-ar {
+    direction: rtl;
+    text-align: right;
+    font-size: 15px;
+    font-weight: 500;
+    color: #2b114d;
+    margin-bottom: 4px;
+    transition: opacity 0.25s, font-weight 0.25s;
+}
+.story-page--dark .sp-ar { color: #d0b0f0; }
+
+/* تمييز الجملة النشطة (يُضبط من script.js) */
+.sp-kr.active-kr {
+    background: rgba(147,112,219,0.22);
+    padding: 8px 12px;
+}
+.sp-ar.active-ar {
+    font-weight: 900;
+    opacity: 1 !important;
+}
+
+/* ── الدرس المستفاد ── */
+.sp-lesson {
+    background: rgba(255,245,251,0.85);
+    border: 2px dashed #ff65a3;
+    border-radius: var(--r-md);
+    padding: 18px 20px;
+    font-size: 14px;
+    line-height: 1.85;
+    color: var(--text-dark);
+}
+.story-page--dark .sp-lesson {
+    background: rgba(80,30,100,0.3);
+    border-color: rgba(232,121,249,0.45);
+    color: #f3e8ff;
+}
+
+/* ── زر الإنهاء ── */
+.sp-done-btn {
+    width: 100%;
+    padding: 16px;
+    background: white;
+    color: var(--text-dark);
+    border: 3px solid #d4b5ff;
+    border-radius: var(--r-lg);
+    font-size: 16px;
+    font-weight: 900;
+    font-family: 'Tajawal', sans-serif;
+    cursor: pointer;
+    box-shadow: 0 6px 0 #d4b5ff;
+    transition: transform 0.1s, box-shadow 0.1s;
+}
+.sp-done-btn:hover { background: #faf5ff; }
+.sp-done-btn:active {
+    transform: translateY(6px);
+    box-shadow: 0 0 0 #d4b5ff;
+}
+.story-page--dark .sp-done-btn {
+    background: rgba(80,30,120,0.5);
+    color: #f3e8ff;
+    border-color: #8b5cf6;
+    box-shadow: 0 6px 0 rgba(139,92,246,0.5);
+}
+
+/* ================================================================
+   مكتبة القصص الجديدة  —  كروت أنظف
+   ================================================================ */
+.story-card {
+    background: rgba(255,255,255,0.82);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 2px solid rgba(255,255,255,0.92);
+    border-radius: var(--r-lg);
+    padding: 20px 14px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.28s var(--ease-smooth);
+    box-shadow: 0 4px 18px rgba(200,150,220,0.12);
+    position: relative;
+}
+.story-card:hover {
+    transform: translateY(-7px) scale(1.02);
+    box-shadow: 0 14px 36px rgba(200,150,220,0.28);
+    border-color: var(--pink-200);
+}
+.story-card--done {
+    border-color: #86efac;
+    background: linear-gradient(135deg, rgba(240,255,244,0.9), rgba(220,252,231,0.7));
+}
+
+.sc-emoji {
+    font-size: 42px;
+    line-height: 1;
+    transition: transform 0.3s var(--ease-bounce);
+    position: relative;
+}
+.story-card:hover .sc-emoji { transform: scale(1.18) rotate(5deg); }
+
+.sc-check {
+    position: absolute;
+    top: -6px;
+    left: -6px;
+    font-size: 16px;
+}
+
+.sc-title {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--text-dark);
+    line-height: 1.4;
+}
+.sc-kr {
+    font-family: 'Fredoka', sans-serif;
+    font-size: 11px;
+    color: #a78bfa;
+    direction: ltr;
+}
+
+.grid-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: var(--text-muted);
+    padding: 48px 20px;
+    font-size: 15px;
+}
+
+/* ── الـ stories-web-grid  يستخدم .story-card الجديد ── */
+.stories-web-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 16px;
+}
+
+/* ── متوافق مع .card القديم تجنباً لأي ظهور خاطئ ── */
+.card { display: none !important; }
+
+/* ── إخفاء الـ section-القديمة story-view-screen ── */
+.story-view-screen { display: none !important; }
+
+/* ================================================================
+   Responsive
+   ================================================================ */
+@media (max-width: 600px) {
+    .sp-card { padding: 20px 16px; gap: 16px; }
+    .sp-story-scroll { max-height: 340px; }
+    .sp-title { font-size: 18px; }
+    .sp-audio-btn { font-size: 14px; padding: 14px; }
+    .stories-web-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+}
+@media (max-width: 380px) {
+    .stories-web-grid { grid-template-columns: 1fr; }
+}

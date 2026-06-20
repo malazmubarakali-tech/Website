@@ -1,429 +1,394 @@
-/* ============================================================
-   web-adapter.js — Fixed version: all 40 stories work
-   ============================================================ */
-
+/* ================================================================
+   web-adapter.js  —  النسخة النهائية المصلحة بالكامل
+   ================================================================ */
 (function () {
-    'use strict';
+'use strict';
 
-    /* ── تتبع التاب والقصة الحالية ── */
-    window.currentTab = 0;
-    var _currentStoryIdx = -1;
+/* ── متغيرات عامة ── */
+window.currentTab   = 0;
+var _activeStory    = -1;   // index القصة المفتوحة حالياً
 
-    /* ══════════════════════════════════════════════
-       1.  showScreen — يُظهر أي شاشة رئيسية
-    ══════════════════════════════════════════════ */
-    window.showScreen = function (screenId) {
-        document.querySelectorAll('.page-screen').forEach(function (s) {
-            s.classList.remove('active-screen');
-        });
-        document.querySelectorAll('.story-view-screen').forEach(function (s) {
-            s.classList.remove('active-screen');
-            s.style.display = 'none';
-        });
+/* ================================================================
+   1.  أدوات مساعدة
+   ================================================================ */
+function q(id){ return document.getElementById(id); }
 
-        var target = document.getElementById(screenId + '-screen');
-        if (target) {
-            target.classList.add('active-screen');
-            target.style.display = 'block';
-        }
+function hideAll(){
+    document.querySelectorAll('.page-screen').forEach(function(s){
+        s.style.display = 'none';
+        s.classList.remove('active-screen');
+    });
+    document.querySelectorAll('.story-page').forEach(function(s){
+        s.style.display = 'none';
+    });
+}
 
-        document.querySelectorAll('.nav-item').forEach(function (t) { t.classList.remove('active'); });
-        var activeTab = document.querySelector('[data-target="' + screenId + '"]');
-        if (activeTab) activeTab.classList.add('active');
+/* ================================================================
+   2.  showScreen  —  يُظهر شاشة رئيسية (home/learn/achievements/profile/stories)
+   ================================================================ */
+window.showScreen = function(id){
+    hideAll();
+    var el = q(id + '-screen');
+    if(el){ el.style.display = 'block'; el.classList.add('active-screen'); }
 
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+    /* تحديث الـ navbar */
+    document.querySelectorAll('.nav-item').forEach(function(t){ t.classList.remove('active'); });
+    var tab = document.querySelector('[data-target="' + id + '"]');
+    if(tab) tab.classList.add('active');
 
-        if (screenId === 'achievements') setTimeout(function () { loadAchievements && loadAchievements(); }, 50);
-        if (screenId === 'learn')        setTimeout(function () { loadLearnContent && loadLearnContent(); }, 50);
-        if (screenId === 'profile')      setTimeout(function () { window.loadProfile && window.loadProfile(); }, 50);
-        if (screenId === 'home')         setTimeout(updateHeroStats, 100);
+    window.scrollTo({top:0, behavior:'smooth'});
 
-        /* لما نفتح شاشة القصص — اعرض التاب الحالي */
-        if (screenId === 'stories') {
-            setTimeout(function () { window.showTab(window.currentTab || 0); }, 80);
-        }
-    };
+    /* تحميل البيانات */
+    if(id === 'achievements') setTimeout(function(){ typeof loadAchievements==='function' && loadAchievements(); }, 60);
+    if(id === 'learn')        setTimeout(function(){ typeof loadLearnContent==='function'  && loadLearnContent(); },  60);
+    if(id === 'profile')      setTimeout(function(){ loadProfile(); }, 60);
+    if(id === 'home')         setTimeout(updateHeroStats, 60);
+    if(id === 'stories')      setTimeout(function(){ window.showTab(window.currentTab || 0); }, 80);
+};
 
-    /* ══════════════════════════════════════════════
-       2.  التنقل بين الشاشات
-    ══════════════════════════════════════════════ */
-    window.switchToMainScreen = function () {
-        typeof cancelTTS === 'function' && cancelTTS();
-        showScreen('home');
-    };
+/* ================================================================
+   3.  التنقل
+   ================================================================ */
+window.switchToMainScreen    = function(){ stopMedia(); showScreen('home'); };
+window.switchToStoriesScreen = function(){ showScreen('stories'); };
+window.goToStoriesWithDelay  = function(){ setTimeout(switchToStoriesScreen, 300); };
 
-    window.switchToStoriesScreen = function () { showScreen('stories'); };
-    window.goToStoriesWithDelay  = function () { setTimeout(switchToStoriesScreen, 300); };
+window.switchToStoriesList = function(){
+    stopMedia();
+    hideAll();
+    var el = q('stories-screen');
+    if(el){ el.style.display='block'; el.classList.add('active-screen'); }
+    document.querySelectorAll('.nav-item').forEach(function(t){ t.classList.remove('active'); });
+    window.scrollTo({top:0, behavior:'smooth'});
+    setTimeout(function(){ window.showTab(window.currentTab || 0); }, 80);
+};
 
-    window.switchToStoriesList = function () {
-        typeof cancelTTS     === 'function' && cancelTTS();
-        typeof stopAllAudio  === 'function' && stopAllAudio();
+function stopMedia(){
+    typeof stopAllAudio === 'function' && stopAllAudio();
+    typeof cancelTTS    === 'function' && cancelTTS();
+}
 
-        document.querySelectorAll('.story-view-screen').forEach(function (s) {
-            s.classList.remove('active-screen');
-            s.style.display = 'none';
-        });
-        showScreen('stories');
-    };
+/* ================================================================
+   4.  openStoryDetails  —  القلب: يفتح صفحة قصة منفصلة
+   ================================================================ */
+window.openStoryDetails = function(idx){
+    _activeStory = idx;
+    stopMedia();
+    hideAll();
 
-    /* ══════════════════════════════════════════════
-       3.  openStoryDetails — يفتح قصة بالـ index
-    ══════════════════════════════════════════════ */
-    window.openStoryDetails = function (index) {
-        /* أنشئ الـ screen إذا لم يكن موجوداً */
-        ensureStoryScreen(index);
+    /* أنشئ الصفحة إذا لم تكن موجودة */
+    ensureStoryPage(idx);
 
-        document.querySelectorAll('.page-screen').forEach(function (s) { s.classList.remove('active-screen'); });
-        document.querySelectorAll('.story-view-screen').forEach(function (s) {
-            s.classList.remove('active-screen');
-            s.style.display = 'none';
-        });
+    var page = q('sp-' + idx);
+    if(!page){ console.warn('story page not found:', idx); return; }
+    page.style.display = 'block';
 
-        var screen = document.getElementById('story-screen-' + index);
-        if (!screen) { console.warn('Story screen not found:', index); return; }
-
-        screen.classList.add('active-screen');
-        screen.style.display = 'block';
-        _currentStoryIdx = index;
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-
-        /* احشو النص إذا فارغ */
-        var textEl = document.getElementById('storyText' + index);
-        if (textEl && textEl.innerHTML.trim() === '' && typeof allStories !== 'undefined' && allStories[index]) {
-            buildStoryHTML(index, allStories[index], textEl);
-        }
-
-        document.querySelectorAll('.nav-item').forEach(function (t) { t.classList.remove('active'); });
-    };
-
-    /* ══════════════════════════════════════════════
-       4.  showTab — يعرض تاب القصص
-    ══════════════════════════════════════════════ */
-    window.showTab = function (index) {
-        window.currentTab = index;
-
-        document.querySelectorAll('.stab').forEach(function (t, i) {
-            t.classList.toggle('active', i === index);
-        });
-        document.querySelectorAll('.tab').forEach(function (t, i) {
-            t.classList.toggle('active', i === index);
-        });
-
-        renderStoriesGrid(index);
-    };
-
-    /* ══════════════════════════════════════════════
-       5.  renderStoriesGrid — يرسم كروت القصص
-    ══════════════════════════════════════════════ */
-    function renderStoriesGrid(tabIndex) {
-        var container = document.getElementById('content');
-        if (!container) return;
-        container.innerHTML = '';
-
-        if (typeof stories === 'undefined') {
-            container.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:40px;">جاري التحميل…</p>';
-            return;
-        }
-
-        var tabStories = stories[tabIndex];
-        if (!tabStories || !tabStories.length) {
-            container.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:40px;">لا توجد قصص في هذا القسم بعد</p>';
-            return;
-        }
-
-        tabStories.forEach(function (story) {
-            var card = document.createElement('div');
-            card.className = 'card';
-
-            var emojiIcon = (typeof emojis !== 'undefined' && emojis[story.id]) ? emojis[story.id] : '📖';
-            var completed  = typeof isStoryCompleted === 'function' && isStoryCompleted(story.id);
-
-            card.style.position = 'relative';
-            card.innerHTML =
-                '<div class="img-box" style="' + (completed ? 'background:#d4edda;border-color:#28a745;' : '') + '">' +
-                    (completed ? '<span style="position:absolute;top:4px;right:4px;font-size:14px;">✅</span>' : '') +
-                    emojiIcon +
-                '</div>' +
-                '<div class="title">' +
-                    (story.titleAR || story.title || '') +
-                    ((story.titleKR || story.kr) ? '<br><span style="font-family:Fredoka,sans-serif;font-size:11px;color:#a78bfa;direction:ltr;">' + (story.titleKR || story.kr) + '</span>' : '') +
-                '</div>';
-
-            card.addEventListener('click', (function (id) {
-                return function () { openStoryDetails(id); };
-            })(story.id));
-
-            container.appendChild(card);
-        });
+    /* احشو النص */
+    var box = q('storyText' + idx);
+    if(box && box.innerHTML.trim() === '' && typeof allStories !== 'undefined' && allStories[idx]){
+        fillStoryText(idx, allStories[idx], box);
     }
 
-    /* ══════════════════════════════════════════════
-       6.  ensureStoryScreen — يبني الـ screen ديناميكياً
-    ══════════════════════════════════════════════ */
-    function ensureStoryScreen(idx) {
-        if (document.getElementById('story-screen-' + idx)) return; /* موجود مسبقاً */
+    window.scrollTo({top:0, behavior:'smooth'});
+    document.querySelectorAll('.nav-item').forEach(function(t){ t.classList.remove('active'); });
+};
 
-        /* حدد نوع القصة */
-        var tabName  = getTabName(idx);
-        var isHorror = (tabName === 'قصص رعب');
+/* ================================================================
+   5.  ensureStoryPage  —  ينشئ عنصر .story-page ديناميكياً
+   ================================================================ */
 
-        /* حاول الحصول على العنوان */
-        var kr = '', ar = '';
-        if (typeof getStoryTitle === 'function') {
-            var t = getStoryTitle(idx);
-            kr = t.kr || '';
-            ar = t.ar || '';
-        }
+/* بيانات ثابتة للقصص 0-19 (موجودة في index.html كـ section) — نستخرج منها العنوان والدرس */
+var STORY_META = {
+    0:  { kr:'💨 방귀쟁이 며느리', tab:'قصص أطفال',   dark:false, lesson:'الصدق والطبيعة أساس الراحة. ما تعتبره عيباً قد يكون مصدر قوتك الحقيقية.' },
+    1:  { kr:'🐰🐢 토끼와 거북이', tab:'قصص أطفال',   dark:false, lesson:'النجاح لا يحتاج سرعة، يحتاج استمراراً. اللي يكمل للنهاية يفوز.' },
+    2:  { kr:'🐦 흥부와 놀부',      tab:'قصص أطفال',   dark:false, lesson:'الطيب والخير يرجعان لصاحبهما. ازرع الخير بنية صادقة ولا تحسد.' },
+    3:  { kr:'🐰🐯 토끼와 호랑이',  tab:'قصص أطفال',   dark:false, lesson:'القوة البدنية وحدها لا تكفي. الذكاء والهدوء يهزمان أي خطر.' },
+    4:  { kr:'💧 젊어지는 샘물',    tab:'قصص أطفال',   dark:false, lesson:'الطمع والجشع دائماً يؤديان لنتائج عكسية. القناعة كنز لا يفنى.' },
+    5:  { kr:'🍉 당나귀 알',        tab:'قصص أطفال',   dark:false, lesson:'العلم والمعرفة ضروريان. اسأل أهل الخبرة قبل أن تنخدع.' },
+    6:  { kr:'🧂 요술 맷돌',        tab:'قصص أطفال',   dark:false, lesson:'الطمع والسرقة لا يجلبان إلا الهلاك. القناعة راحة.' },
+    7:  { kr:'⚖️ 토끼의 재판',      tab:'قصص ممتعة',  dark:false, lesson:'الذكاء ينتصر على القوة الغاشمة. العقل هو أقوى سلاح.' },
+    8:  { kr:'🐓 수탉과 왕관',      tab:'قصص ممتعة',  dark:false, lesson:'لا تنخدع بكلام المتملقين. الغرور يؤدي إلى الخسارة.' },
+    9:  { kr:'🐭 생쥐들과 방울',    tab:'قصص ممتعة',  dark:false, lesson:'أفضل الخطط لا قيمة لها بدون الشجاعة لتنفيذها.' },
+    10: { kr:'👁️ 사각지대',         tab:'قصص رعب',    dark:true,  lesson:'الرعب الحقيقي لا يأتي من الخارج، بل من أعماق النفس البشرية.' },
+    11: { kr:'🛏️ 7번 병상',         tab:'قصص رعب',    dark:true,  lesson:'العقل البشري قد يكون أعظم سجّان لنفسه.' },
+    12: { kr:'📞 집 안에서 걸려 온 전화', tab:'قصص رعب', dark:true, lesson:'الخطر قد يكون مختبئاً في ظلال منازلنا.' },
+    13: { kr:'👂 이식된 목소리',     tab:'قصص رعب',    dark:true,  lesson:'التكنولوجيا قد تسمح لنا بسماع ما لم يُخلق لنا أن نسمعه.' },
+    14: { kr:'📄 하얀 페이지',       tab:'قصص رعب',    dark:true,  lesson:'هل نحن بشر حقيقيون أم مجرد سطور في محاكاة؟' },
+    15: { kr:'🛗 잃어버린 층',       tab:'قصص رعب',    dark:true,  lesson:'هناك عوالم تعيش بين طيات واقعنا، لا تنزل في المحطة الخطأ.' },
+    16: { kr:'🧱 벽 속의 손님',      tab:'قصص رعب',    dark:true,  lesson:'العقل المنعزل قد يخلق حقيقة بديلة كاملة ليهرب من الوحدة.' },
+    17: { kr:'📻 한밤의 라디오 방송', tab:'قصص رعب',   dark:true,  lesson:'كم من الأصوات التي نسمعها يومياً هي حقيقية حقاً؟' },
+    18: { kr:'⚖️ 과도한 무게',       tab:'قصص رعب',    dark:true,  lesson:'أكثر الكوابيس رعباً تأتي من المساحات التي نعتقد أنها آمنة.' },
+    19: { kr:'🖼️ 움직이는 그림',     tab:'قصص رعب',    dark:true,  lesson:'بعض النظرات تبقى محفورة في الذاكرة للأبد.' }
+};
 
-        var screen = document.createElement('section');
-        screen.id        = 'story-screen-' + idx;
-        screen.className = 'story-view-screen' + (isHorror ? ' horror-story' : '');
-        screen.style.display = 'none';
+function getStoryMeta(idx){
+    if(STORY_META[idx]) return STORY_META[idx];
 
-        screen.innerHTML =
-            '<div class="story-web-layout">' +
-                '<div class="story-sidebar ' + (isHorror ? 'dark-sidebar' : '') + '">' +
-                    '<button class="story-back-web" onclick="switchToStoriesList()">' +
-                        '<i class="fa-solid fa-arrow-right"></i> رجوع' +
-                    '</button>' +
-                    '<div class="story-meta-web">' +
-                        '<h1>' + (kr || '📖') + '</h1>' +
-                        '<p class="story-cat-tag ' + (isHorror ? 'horror-tag' : '') + '">' + tabName + '</p>' +
-                    '</div>' +
-                    '<button class="audio-btn-web" id="audioBtn' + idx + '" onclick="toggleAudio(' + idx + ')">' +
-                        '<span id="btnContent' + idx + '"><i class="fa-solid fa-play"></i> تشغيل الصوت</span>' +
-                    '</button>' +
-                    '<div class="tts-status" id="ttsStatus' + idx + '"></div>' +
-                    (ar ? '<div class="lesson web-lesson ' + (isHorror ? 'dark-lesson' : '') + '"><strong>📌 الدرس المستفاد</strong><br>' + ar + '</div>' : '') +
-                    '<button class="done-btn-web" onclick="completeStoryAndGoBack()">أنهيت القصة بنجاح! 🎉</button>' +
-                '</div>' +
-                '<div class="story-content-web">' +
-                    '<div class="story-container" id="storyText' + idx + '"></div>' +
-                '</div>' +
-            '</div>';
-
-        document.querySelector('.main-wrapper').appendChild(screen);
-    }
-
-    function getTabName(idx) {
-        /* القصص الأصلية 0-9 في index.html هي أطفال وممتعة */
-        /* بعد دمج script.js: children=0, fun=1, emotional=2, horror=3 */
-        /* نستعمل مصفوفة stories إذا كانت متاحة */
-        if (typeof stories !== 'undefined') {
-            for (var t = 0; t < stories.length; t++) {
-                if (stories[t] && stories[t].some(function (s) { return s.id === idx; })) {
-                    return ['قصص أطفال', 'قصص ممتعة', 'قصص عاطفية', 'قصص رعب'][t] || 'قصص';
+    /* للقصص الديناميكية 20-39: اقرأ من مصفوفة stories */
+    var tab = 'قصص', kr = '📖', dark = false, lesson = '';
+    if(typeof stories !== 'undefined'){
+        for(var t = 0; t < stories.length; t++){
+            if(!stories[t]) continue;
+            for(var s = 0; s < stories[t].length; s++){
+                if(stories[t][s].id === idx){
+                    kr = stories[t][s].titleKR || kr;
+                    tab = ['قصص أطفال','قصص ممتعة','قصص عاطفية','قصص رعب'][t] || tab;
+                    dark = (t === 3);
+                    break;
                 }
             }
         }
-        return 'قصص';
     }
+    return { kr:kr, tab:tab, dark:dark, lesson:lesson };
+}
 
-    /* ══════════════════════════════════════════════
-       7.  buildStoryHTML — يبني نص القصة
-    ══════════════════════════════════════════════ */
-    function buildStoryHTML(idx, storyData, container) {
-        if (!storyData || !container) return;
-        var html = '';
-        storyData.forEach(function (sentence, i) {
-            if (sentence.kr) html += '<p class="kr-block"><span id="s' + idx + '_' + i + '" class="word">' + sentence.kr + '</span></p>';
-            if (sentence.ar) html += '<p class="ar-block">' + sentence.ar + '</p>';
-        });
-        container.innerHTML = html;
-    }
+function ensureStoryPage(idx){
+    if(q('sp-' + idx)) return;   /* موجودة مسبقاً */
 
-    /* ══════════════════════════════════════════════
-       8.  initStories override — يحشو النصوص للـ screens الموجودة
-    ══════════════════════════════════════════════ */
-    window.initStories = function () {
-        if (typeof allStories === 'undefined') return;
-        allStories.forEach(function (storyData, idx) {
-            var textEl = document.getElementById('storyText' + idx);
-            if (textEl && textEl.innerHTML.trim() === '') {
-                buildStoryHTML(idx, storyData, textEl);
-            }
-        });
-    };
+    var m    = getStoryMeta(idx);
+    var dark = m.dark;
 
-    /* ══════════════════════════════════════════════
-       9.  تتبع إكمال القصص (يُستخدم في renderStoriesGrid وcompleteStoryAndGoBack)
-    ══════════════════════════════════════════════ */
-    window.isStoryCompleted = function (idx) {
-        var stored = JSON.parse(localStorage.getItem('korean_app_achievements') || '{}');
-        return Array.isArray(stored.completedStoryIds) && stored.completedStoryIds.indexOf(idx) !== -1;
-    };
+    var page = document.createElement('div');
+    page.id        = 'sp-' + idx;
+    page.className = 'story-page' + (dark ? ' story-page--dark' : '');
+    page.style.display = 'none';
 
-    window.saveStoryCompletion = function (idx) {
-        var stored = (typeof getAchievements === 'function')
-            ? getAchievements()
-            : JSON.parse(localStorage.getItem('korean_app_achievements') || '{}');
-        if (!Array.isArray(stored.completedStoryIds)) stored.completedStoryIds = [];
-        if (stored.completedStoryIds.indexOf(idx) === -1) {
-            stored.completedStoryIds.push(idx);
-            stored.storiesCompleted = (stored.storiesCompleted || 0) + 1;
-            stored.xp = (stored.xp || 0) + 20;
-            if (typeof checkBadges === 'function') checkBadges(stored);
-        }
-        if (typeof saveAchievements === 'function') {
-            saveAchievements(stored);
-        } else {
-            localStorage.setItem('korean_app_achievements', JSON.stringify(stored));
-        }
-    };
+    page.innerHTML =
+        /* ── شريط العودة ── */
+        '<div class="sp-topbar">' +
+            '<button class="sp-back-btn" onclick="switchToStoriesList()">' +
+                '<i class="fa-solid fa-arrow-right"></i> رجوع للقصص' +
+            '</button>' +
+            '<span class="sp-tab-badge">' + m.tab + '</span>' +
+        '</div>' +
 
-    /* ══════════════════════════════════════════════
-       10. completeStoryAndGoBack
-    ══════════════════════════════════════════════ */
-    window.completeStoryAndGoBack = function () {
-        var idx = _currentStoryIdx;
-        if (idx >= 0 && typeof saveStoryCompletion === 'function') {
-            saveStoryCompletion(idx);
-        }
-        typeof stopAllAudio === 'function' && stopAllAudio();
-        typeof cancelTTS    === 'function' && cancelTTS();
+        /* ── بطاقة القصة ── */
+        '<div class="sp-card">' +
 
-        showToast('🎉 أحسنت! تم حفظ تقدمك');
-        setTimeout(function () {
-            switchToStoriesList();
-            updateHeroStats();
-        }, 600);
-    };
+            /* عنوان */
+            '<div class="sp-title-row">' +
+                '<h1 class="sp-title">' + m.kr + '</h1>' +
+            '</div>' +
 
-    /* ══════════════════════════════════════════════
-       11. Profile
-    ══════════════════════════════════════════════ */
-    window.loadProfile = function () {
-        var stored = JSON.parse(localStorage.getItem('korean_app_achievements') || '{}');
+            /* زر الصوت */
+            '<button class="sp-audio-btn" id="audioBtn' + idx + '" onclick="toggleAudio(' + idx + ')">' +
+                '<span id="btnContent' + idx + '">' +
+                    '<i class="fa-solid fa-play"></i> تشغيل الصوت' +
+                '</span>' +
+            '</button>' +
+            '<div class="sp-tts-status" id="ttsStatus' + idx + '"></div>' +
 
-        var set = function (id, val) { var el = document.getElementById(id); if (el) el.textContent = val; };
+            /* نص القصة */
+            '<div class="sp-story-scroll">' +
+                '<div class="sp-story-text" id="storyText' + idx + '"></div>' +
+            '</div>' +
 
-        set('userName',    stored.userName   || 'متعلم');
-        set('userAvatar',  stored.userAvatar || '😊');
-        set('streakDays',  stored.streakDays || 0);
+            /* الدرس المستفاد */
+            (m.lesson ? '<div class="sp-lesson">' +
+                '<strong>📌 الدرس المستفاد</strong><br>' + m.lesson +
+            '</div>' : '') +
 
-        var days = stored.streakDays || 0;
-        set('streakMessage',
-            days === 0  ? 'ابدأ رحلتك اليوم!'       :
-            days < 7    ? 'استمر، أنت تتحسن!'        :
-            days < 30   ? 'رائع! أسبوع من التعلم!'   :
-                          '🏆 أنت أسطورة!');
+            /* زر الإنهاء */
+            '<button class="sp-done-btn" onclick="completeStoryAndGoBack()">' +
+                'أنهيت القصة بنجاح! 🎉' +
+            '</button>' +
 
-        set('totalHours',     Math.floor((stored.xp || 0) / 10));
-        set('completionRate', Math.round(((stored.storiesCompleted || 0) / 40) * 100) + '%');
-        set('totalItems',     (stored.storiesCompleted || 0) + (stored.listeningCompleted || 0) + (stored.writingCompleted || 0));
-    };
+        '</div>';  /* end sp-card */
 
-    window.openEditProfile = function () {
-        var sec = document.getElementById('editProfileSection');
-        if (sec) { sec.style.display = 'block'; sec.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
-        var stored = JSON.parse(localStorage.getItem('korean_app_achievements') || '{}');
-        var inp = document.getElementById('customName');
-        if (inp) inp.value = stored.userName || '';
-        document.querySelectorAll('.avatar-option').forEach(function (o) {
-            o.classList.toggle('selected', o.dataset.avatar === (stored.userAvatar || '😊'));
-        });
-    };
+    document.querySelector('.main-wrapper').appendChild(page);
+}
 
-    window.closeEditProfile = function () {
-        var sec = document.getElementById('editProfileSection');
-        if (sec) sec.style.display = 'none';
-    };
-
-    window.saveCustomProfile = function () {
-        var stored = JSON.parse(localStorage.getItem('korean_app_achievements') || '{}');
-        var inp = document.getElementById('customName');
-        var sel = document.querySelector('.avatar-option.selected');
-        if (inp && inp.value.trim()) stored.userName = inp.value.trim();
-        if (sel) stored.userAvatar = sel.dataset.avatar;
-        localStorage.setItem('korean_app_achievements', JSON.stringify(stored));
-        closeEditProfile();
-        window.loadProfile();
-        updateHeroStats();
-        showToast('✅ تم حفظ التغييرات!');
-    };
-
-    document.addEventListener('click', function (e) {
-        if (e.target.classList.contains('avatar-option')) {
-            document.querySelectorAll('.avatar-option').forEach(function (o) { o.classList.remove('selected'); });
-            e.target.classList.add('selected');
-        }
+/* ================================================================
+   6.  fillStoryText  —  يبني نص القصة داخل الحاوية
+   ================================================================ */
+function fillStoryText(idx, data, container){
+    if(!data || !container) return;
+    var html = '';
+    data.forEach(function(s, i){
+        if(s.kr) html += '<p class="sp-kr kr-block" id="s' + idx + '_' + i + '">' + s.kr + '</p>';
+        if(s.ar) html += '<p class="sp-ar ar-block">' + s.ar + '</p>';
     });
+    container.innerHTML = html;
+}
 
-    window.handleLogout = function () {
-        if (!confirm('إعادة تعيين كل التقدم؟ لا يمكن التراجع.')) return;
-        ['korean_app_achievements','used_tips','used_topik','used_motivations'].forEach(function (k) {
-            localStorage.removeItem(k);
-        });
-        showToast('♻️ تم إعادة تعيين التقدم');
-        window.loadProfile();
+/* ================================================================
+   7.  showTab  —  يعرض تاب في مكتبة القصص
+   ================================================================ */
+window.showTab = function(idx){
+    window.currentTab = idx;
+    document.querySelectorAll('.stab').forEach(function(t,i){ t.classList.toggle('active', i===idx); });
+    renderGrid(idx);
+};
+
+function renderGrid(tabIdx){
+    var box = q('content');
+    if(!box) return;
+    box.innerHTML = '';
+
+    if(typeof stories === 'undefined' || !stories[tabIdx] || !stories[tabIdx].length){
+        box.innerHTML = '<p class="grid-empty">لا توجد قصص هنا بعد</p>';
+        return;
+    }
+
+    stories[tabIdx].forEach(function(story){
+        if(!story || story.id === -1) return;
+        var emoji  = (typeof emojis !== 'undefined' && emojis[story.id]) ? emojis[story.id] : '📖';
+        var done   = isCompleted(story.id);
+        var card   = document.createElement('div');
+        card.className = 'story-card' + (done ? ' story-card--done' : '');
+        card.innerHTML =
+            '<div class="sc-emoji">' + emoji + (done ? '<span class="sc-check">✅</span>' : '') + '</div>' +
+            '<div class="sc-title">' + (story.titleAR || '') + '</div>' +
+            '<div class="sc-kr">'   + (story.titleKR || '') + '</div>';
+        card.addEventListener('click', (function(id){ return function(){ openStoryDetails(id); }; })(story.id));
+        box.appendChild(card);
+    });
+}
+
+/* ================================================================
+   8.  completeStoryAndGoBack
+   ================================================================ */
+window.completeStoryAndGoBack = function(){
+    if(_activeStory >= 0){
+        var d = getAchievements();
+        d.storiesCompleted = (d.storiesCompleted || 0) + 1;
+        d.xp = (d.xp || 0) + 20;
+        if(!d.completedList) d.completedList = [];
+        if(d.completedList.indexOf(_activeStory) === -1) d.completedList.push(_activeStory);
+        checkBadges(d);
+        saveAchievements(d);
+    }
+    stopMedia();
+    showToastMsg('🎉 أحسنت! تم حفظ تقدمك');
+    setTimeout(function(){
+        switchToStoriesList();
+        updateHeroStats();
+    }, 600);
+};
+
+/* ================================================================
+   9.  مساعدات الإنجازات
+   ================================================================ */
+function isCompleted(id){
+    var d = getAchievements();
+    return d.completedList && d.completedList.indexOf(id) !== -1;
+}
+window.isStoryCompleted = isCompleted;
+
+/* ================================================================
+   10. الملف الشخصي
+   ================================================================ */
+window.loadProfile = function(){
+    var d = getAchievements();
+    setText('userName',    d.userName  || 'متعلم');
+    setText('userAvatar',  d.userAvatar|| '😊');
+    setText('streakDays',  d.streakDays|| 0);
+    var days = d.streakDays || 0;
+    setText('streakMessage',
+        days===0   ? 'ابدأ رحلتك اليوم!'      :
+        days < 7   ? 'استمر، أنت تتحسن!'       :
+        days < 30  ? 'رائع! أسبوع من التعلم!'  : '🏆 أنت أسطورة!');
+    setText('totalHours',     Math.floor((d.xp||0)/10));
+    setText('completionRate', Math.round(((d.storiesCompleted||0)/40)*100) + '%');
+    setText('totalItems',     (d.storiesCompleted||0)+(d.listeningCompleted||0)+(d.writingCompleted||0));
+};
+
+function setText(id,val){ var el=q(id); if(el) el.textContent=val; }
+
+window.openEditProfile = function(){
+    var sec=q('editProfileSection');
+    if(sec){ sec.style.display='block'; sec.scrollIntoView({behavior:'smooth',block:'nearest'}); }
+    var d=getAchievements();
+    var inp=q('customName'); if(inp) inp.value=d.userName||'';
+    document.querySelectorAll('.avatar-option').forEach(function(o){
+        o.classList.toggle('selected', o.dataset.avatar===(d.userAvatar||'😊'));
+    });
+};
+window.closeEditProfile = function(){
+    var sec=q('editProfileSection'); if(sec) sec.style.display='none';
+};
+window.saveCustomProfile = function(){
+    var d=getAchievements();
+    var inp=q('customName');   if(inp&&inp.value.trim()) d.userName=inp.value.trim();
+    var sel=document.querySelector('.avatar-option.selected'); if(sel) d.userAvatar=sel.dataset.avatar;
+    saveAchievements(d);
+    window.closeEditProfile();
+    window.loadProfile();
+    updateHeroStats();
+    showToastMsg('✅ تم حفظ التغييرات!');
+};
+document.addEventListener('click',function(e){
+    if(e.target.classList.contains('avatar-option')){
+        document.querySelectorAll('.avatar-option').forEach(function(o){ o.classList.remove('selected'); });
+        e.target.classList.add('selected');
+    }
+});
+window.handleLogout = function(){
+    if(!confirm('إعادة تعيين كل التقدم؟ لا يمكن التراجع.')) return;
+    ['korean_app_achievements','used_tips','used_topik','used_motivations'].forEach(function(k){
+        localStorage.removeItem(k);
+    });
+    showToastMsg('♻️ تم إعادة تعيين التقدم');
+    window.loadProfile(); loadAchievements && loadAchievements(); updateHeroStats();
+};
+
+/* ================================================================
+   11. Toast
+   ================================================================ */
+function showToastMsg(msg){
+    var t=q('toastWeb');
+    if(t){ t.textContent=msg; t.classList.add('show'); setTimeout(function(){ t.classList.remove('show'); },3000); }
+}
+window.showToast      = showToastMsg;
+window.showStoryToast = showToastMsg;
+
+/* ================================================================
+   12. روابط الوحدات الأخرى
+   ================================================================ */
+window.goToChatWithDelay = function(){ setTimeout(function(){ window.location.href='chat.html'; },300); };
+window.openReading       = function(){ setTimeout(function(){ window.location.href='reading-menu.html'; },300); };
+window.openListening     = function(){ setTimeout(function(){ window.location.href='listening-system.html'; },300); };
+window.openWriting       = function(){ setTimeout(function(){ window.location.href='writing-system.html'; },300); };
+
+/* stubs */
+window.bindNavigationEvents = function(){};
+window.initStories = function(){
+    if(typeof allStories==='undefined') return;
+    allStories.forEach(function(data,idx){
+        var el=q('storyText'+idx);
+        if(el && el.innerHTML.trim()==='' && data) fillStoryText(idx,data,el);
+    });
+};
+
+/* ================================================================
+   13. التهيئة عند تحميل الصفحة
+   ================================================================ */
+window.addEventListener('load', function(){
+    /* أخفِ كل شيء وأظهر الرئيسية */
+    document.querySelectorAll('.page-screen').forEach(function(s){
+        var isHome = s.id==='home-screen';
+        s.style.display = isHome ? 'block' : 'none';
+        s.classList.toggle('active-screen', isHome);
+    });
+    /* أخفِ الـ section القديمة للقصص (story-view-screen) كانت موجودة في index القديم */
+    document.querySelectorAll('.story-view-screen').forEach(function(s){ s.style.display='none'; });
+
+    setTimeout(function(){
+        typeof loadLearnContent==='function' && loadLearnContent();
         loadAchievements && loadAchievements();
+        window.loadProfile();
         updateHeroStats();
-    };
+        loadStoriesPreview();
+    },200);
 
-    /* ══════════════════════════════════════════════
-       12. روابط الوحدات الأخرى
-    ══════════════════════════════════════════════ */
-    window.goToChatWithDelay = function () { setTimeout(function () { window.location.href = 'chat.html'; }, 300); };
-    window.openReading       = function () { setTimeout(function () { window.location.href = 'reading-menu.html'; }, 300); };
-    window.openListening     = function () { setTimeout(function () { window.location.href = 'listening-system.html'; }, 300); };
-    window.openWriting       = function () { setTimeout(function () { window.location.href = 'writing-system.html'; }, 300); };
-
-    /* ══════════════════════════════════════════════
-       13. Toast
-    ══════════════════════════════════════════════ */
-    window.showToast = window.showStoryToast = function (msg) {
-        var t = document.getElementById('toastWeb');
-        if (t) {
-            t.textContent = msg;
-            t.classList.add('show');
-            setTimeout(function () { t.classList.remove('show'); }, 3000);
-        }
-    };
-
-    /* ══════════════════════════════════════════════
-       14. Stubs
-    ══════════════════════════════════════════════ */
-    window.bindNavigationEvents = function () {};
-
-    /* ══════════════════════════════════════════════
-       15. التهيئة عند تحميل الصفحة
-    ══════════════════════════════════════════════ */
-    window.addEventListener('load', function () {
-        document.body.style.visibility = 'visible';
-
-        /* أظهر الرئيسية فقط */
-        document.querySelectorAll('.page-screen').forEach(function (s) {
-            s.classList.toggle('active-screen', s.id === 'home-screen');
-        });
-        document.querySelectorAll('.story-view-screen').forEach(function (s) {
-            s.style.display = 'none';
-        });
-
-        /* حشو بيانات كل الـ screens الموجودة في HTML (0-19) */
-        if (typeof allStories !== 'undefined') {
-            allStories.forEach(function (data, idx) {
-                var el = document.getElementById('storyText' + idx);
-                if (el && el.innerHTML.trim() === '') buildStoryHTML(idx, data, el);
-            });
-        }
-
-        /* تحميل البيانات الأولية */
-        setTimeout(function () {
-            loadLearnContent  && loadLearnContent();
-            loadAchievements  && loadAchievements();
-            window.loadProfile();
-            updateHeroStats();
-            loadStoriesPreview();
-        }, 200);
-
-        /* إذا كان URL يحتوي go=stories */
-        if (window.location.search.includes('go=stories')) {
-            history.replaceState(null, '', window.location.pathname);
-            setTimeout(switchToStoriesScreen, 400);
-        }
-
-        console.log('✅ web-adapter v2 ready');
-    });
+    if(sessionStorage.getItem('openStories')==='true'){
+        sessionStorage.removeItem('openStories');
+        setTimeout(switchToStoriesScreen,400);
+    } else if(window.location.search.includes('go=stories')){
+        history.replaceState(null,'',window.location.pathname);
+        setTimeout(switchToStoriesScreen,400);
+    }
+    console.log('✅ web-adapter v3 ready');
+});
 
 })();
-
